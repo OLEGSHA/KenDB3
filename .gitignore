@@ -1,0 +1,9 @@
+# Python leftovers
+*.py[cod]
+__pycache__
+
+# Default developer database
+/db.sqlite3
+
+# Project is not production-ready, so migrations are not committed for now.
+migrations

@@ -28,6 +28,10 @@ cd KenDB3
 
 # Install Python packages
 pip3 install -r requirements.txt
+
+# Configure development database (see below)
+python3 manage.py makemigrations
+python3 manage.py migrate
 ```
 
 Run a development server with a SQLite3 database:
@@ -37,6 +41,10 @@ python3 manage.py runserver
 ```
 
 See [Django 4.2 documentation](https://docs.djangoproject.com/en/4.2/) for more information.
+
+### `makemigrations`???
+
+Project is not production-ready yet. Migrations will be committed once the code is deployed on windcorp.ru.
 
 ## Libraries
 

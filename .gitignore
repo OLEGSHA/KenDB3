@@ -5,5 +5,8 @@ __pycache__
 # Default developer database
 /db.sqlite3
 
-# Project is not production-ready, so migrations are not committed for now.
-migrations
+# See README.md
+**/migrations/*
+# migrations/__init__.py is required to make `python3 manage.py makemigrations`
+# work without listing all apps.
+!**/migrations/__init__.py

@@ -1,6 +1,6 @@
 # KenDB3 web application
 
-This is the source code of KenDB3, intended to go live on https://kendb.windcorp.ru. Contributions are welcome.
+This is the source code of KenDB3, intended to go live on https://kendb.windcorp.ru/. Contributions are welcome.
 
 ## Approach and stack
 
@@ -45,4 +45,4 @@ See [Django 4.2 documentation](https://docs.djangoproject.com/en/4.2/) for more 
 
 ## License and reuse
 
-Code and assets in this repository are licensed under AGPLv3-or-later (see [LICENSE](LICENSE)). However, it not designed to be deployed anywhere except on windcorp.ru.
+Code and assets in this repository are licensed under AGPLv3-or-later (see [LICENSE](LICENSE)). However, it is not designed to be deployed anywhere except on windcorp.ru.

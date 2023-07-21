@@ -10,3 +10,6 @@ __pycache__
 # migrations/__init__.py is required to make `python3 manage.py makemigrations`
 # work without listing all apps.
 !**/migrations/__init__.py
+
+# Some weirdos use Kate
+*.kate-swp

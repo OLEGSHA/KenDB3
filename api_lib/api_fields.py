@@ -107,6 +107,8 @@ implemented by using fields with `_id` suffix if they exist.
 Note that fields are set in the order of their registration.
 """
 
+from django.db import models
+
 
 def api_model(cls):
     """Create API methods and classmethods in cls.
@@ -279,8 +281,17 @@ class APIEngine:
                                      f"in {cls}: {{}}")
                 )
 
-            if hasattr(cls, f"{name}_id"):
-                name = f"{name}_id"
+            if not hasattr(cls, name):
+                # Probably a dynamic attribute
+                pass
+            else:
+                attribute = getattr(cls, name)
+
+                # Check for foreign keys and use object IDs instead
+                if isinstance(attribute, models.ForeignKey):
+                    name = f"{name}_id"
+                elif isinstance(attribute, models.OneToOneField):
+                    name = f"{name}_id"
 
             for group in request.groups:
                 if group not in field_groups:

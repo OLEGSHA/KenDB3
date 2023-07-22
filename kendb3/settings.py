@@ -52,6 +52,7 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'profiles.apps.ProfilesConfig',
+    'submissions.apps.SubmissionsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

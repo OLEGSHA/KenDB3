@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Submission, SubmissionRevision, MinecraftVersion
+
+
+admin.site.register(Submission)
+admin.site.register(SubmissionRevision)
+admin.site.register(MinecraftVersion)

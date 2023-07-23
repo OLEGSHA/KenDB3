@@ -82,8 +82,9 @@ class Submission(models.Model):
 
     #_api.add_field('submission_revision_set')  # TODO
 
-    def get_latest_revision():
-        return max(submission_revision_set, key=lambda r: r.submitted_at,
+    def get_latest_revision(self):
+        return max(self.submissionrevision_set.all(),
+                   key=lambda r: r.submitted_at,
                    default=None)
 
     def __str__(self):
@@ -96,7 +97,7 @@ class Submission(models.Model):
         else:
             name = '<no revisions>'
 
-        return f"#{submission_id} {name}"
+        return f"#{self.submission_id} {name}"
 
 
 @api_model
@@ -176,7 +177,7 @@ class SubmissionRevision(models.Model):
     rules: _api() = models.JSONField(
         help_text=('Rules, permissions and other important remarks players '
                    'should read before playing. '
-                   '<Format to be decided>.'),  # TODO
+                   '[Format to be decided].'),  # TODO
     )
 
     author_notes: _api() = models.TextField(
@@ -195,4 +196,4 @@ class SubmissionRevision(models.Model):
     )
 
     def __str__(self):
-        return f"{revision_of} v{revision_string}"
+        return f"{self.revision_of} v{self.revision_string}"

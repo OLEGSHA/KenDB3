@@ -1,3 +1,12 @@
 from django.shortcuts import render
 
-# Create your views here.
+from submissions.models import Submission, SubmissionRevision, MinecraftVersion
+
+from api_lib import api_responses
+
+
+def index(request):
+    return api_responses.success({
+        'submissions': [s.api_serialize('basic')
+                        for s in Submission.objects.all()]
+    })

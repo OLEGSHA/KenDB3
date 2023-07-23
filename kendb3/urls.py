@@ -9,5 +9,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('api/v0/profiles/', include('profiles.urls')),
+    path('api/v0/submissions/', include('submissions.urls')),
     path('admin/', admin.site.urls),
 ]

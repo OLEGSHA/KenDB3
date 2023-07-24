@@ -108,6 +108,7 @@ Note that fields are set in the order of their registration.
 """
 
 import builtins
+from collections import namedtuple
 
 from django.db import models
 
@@ -133,7 +134,7 @@ class _Registrar:
     def __init__(self, api_engine, groups):
         self.groups = groups
         self.api_engine = api_engine
-        api_engine._request(self, groups)
+        api_engine._request(self, groups=groups)
 
     def __call__(self, field):
         if isinstance(field, builtins.property):
@@ -182,7 +183,7 @@ class _Registrar:
                 return f"{registrar}.property({spr})"
 
         first_wrapper = _APIProperty(getter)
-        request = self.api_engine._request(first_wrapper, self.groups)
+        request = self.api_engine._request(first_wrapper, groups=self.groups)
         return first_wrapper
 
 
@@ -197,7 +198,7 @@ class APIEngine:
 
         See APIEngine._request() for details.
         """
-        def __init__(self, find_by, groups):
+        def __init__(self, find_by, groups, getter=None, setter=None):
             if isinstance(groups, str):
                 raise TypeError('groups must be a non-str iterable')
             bad_groups = [g for g in groups if not isinstance(g, str)]
@@ -206,6 +207,7 @@ class APIEngine:
 
             self.find_by = find_by
             self.groups = groups
+            self.accessors = (getter, setter) if getter or setter else None
 
     def __init__(self):
         self._requests = []
@@ -215,7 +217,7 @@ class APIEngine:
     def __call__(self, *groups):
         return _Registrar(self, groups or ['*'])
 
-    def _request(self, find_by, groups):
+    def _request(self, find_by, **kwargs):
         """Request that a field identified by find_by be registered as a field.
 
         find_by can take these values:
@@ -232,21 +234,35 @@ class APIEngine:
             raise ValueError('API is already assembled, '
                              f"cannot request registration of {find_by!r}")
 
-        request = APIEngine._Request(find_by, groups)
+        request = APIEngine._Request(find_by, **kwargs)
         self._requests.append(request)
         return request
 
-    def add_field(self, name, groups='*'):
+    def add_field(self, name, groups='*', getter=None, setter=None):
         """Manually register an API field in given groups.
 
         Prefer using annotations or decorators to this manual method.
 
         groups can be a single str or an iterable of strs. If omitted, defaults
         to '*'.
+
+        getter and setter, if specified, will be used to serialize and deseri-
+        alize the field. Their call signatures should match getattr and setattr
+        builtins.
         """
         if isinstance(groups, str):
             groups = [groups]
-        self._request(name, groups)
+        self._request(name, groups=groups, getter=getter, setter=setter)
+
+    def add_related(self, name, groups='*'):
+        """Register a related manager as an API field in given groups.
+
+        groups can be a single str or an iterable of strs. If omitted, defaults
+        to '*'.
+        """
+        self.add_field(name, groups,
+                       getter=_related_manager_get,
+                       setter=_related_manager_set)
 
     def _assemble_groups(self, cls):
         field_groups = {}
@@ -279,22 +295,15 @@ class APIEngine:
                                      f"in {cls}: {{}}")
                 )
 
-            if not hasattr(cls, name):
-                # Probably a dynamic attribute
-                pass
+            if request.accessors:
+                field = FieldMeta(name, *request.accessors)
             else:
-                attribute = getattr(cls, name)
-
-                # Check for foreign keys and use object IDs instead
-                if isinstance(attribute, models.ForeignKey):
-                    name = f"{name}_id"
-                elif isinstance(attribute, models.OneToOneField):
-                    name = f"{name}_id"
+                field = _determine_field_meta(cls, name)
 
             for group in request.groups:
                 if group not in field_groups:
                     field_groups[group] = []
-                field_groups[group].append(name)
+                field_groups[group].append(field)
 
         self.field_groups = field_groups
 
@@ -338,6 +347,44 @@ def _find_exactly_one(candidates, message_if_zero, message_if_many):
     return candidate1
 
 
+FieldMeta = namedtuple('FieldMeta',
+                       'name, getter, setter',
+                       defaults=(getattr, setattr))
+
+
+def _determine_field_meta(cls, name):
+    """Create FieldMeta for field registered as name in model cls."""
+
+    if not hasattr(cls, name):
+        # Probably a dynamic attribute
+        return FieldMeta(name)
+
+    attribute = getattr(cls, name)
+
+    # Check for foreign keys and use object IDs instead
+    if isinstance(attribute, models.ForeignKey):
+        return FieldMeta(f"{name}_id")
+    elif isinstance(attribute, models.OneToOneField):
+        return FieldMeta(f"{name}_id")
+
+    # Check for RelatedManager
+    if hasattr(attribute, 'related_manager_cls'):
+        return FieldMeta(name, _related_manager_get, _related_manager_set)
+
+    return FieldMeta(name)
+
+
+def _related_manager_get(obj, name):
+    manager = getattr(obj, name)
+    return [pk for (pk,) in manager.values_list('pk')]
+
+
+def _related_manager_set(obj, name, value):
+    manager = getattr(obj, name)
+    objects = manager.model.objects.filter(pk__in=value)
+    manager.set(objects)
+
+
 def _api_serialize_impl(self, group='*'):
     """Serializes this object into a Python dict.
 
@@ -346,7 +393,7 @@ def _api_serialize_impl(self, group='*'):
     """
 
     fields = type(self)._api._get_fields(group)
-    result = {name: getattr(self, name) for name in fields}
+    result = {name: getter(self, name) for name, getter, _ in fields}
     result['id'] = self.pk
     return result
 
@@ -355,7 +402,7 @@ def _api_serialize_impl(self, group='*'):
 def _api_deserialize_impl(cls, data, group='*'):
     """Creates an object from a Python dict.
 
-    The object is created as if
+    The object is created roughly so:
 
         obj = type(self)()
         if 'id' in data: obj.pk = data['id']
@@ -374,7 +421,7 @@ def _api_deserialize_impl(cls, data, group='*'):
     if 'id' in data:
         obj.pk = data['id']
 
-    for field in fields:
+    for field, _, setter in fields:
         if field in data:
-            setattr(obj, field, data[field])
+            setter(self, field, data[field])
     return obj

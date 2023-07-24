@@ -77,12 +77,12 @@ class Submission(models.Model):
 
     _api = APIEngine()
 
-    submission_id: _api() = models.SmallIntegerField(
+    submission_id = models.SmallIntegerField(
         help_text=('Submission ID shown to visitors.'),
-        primary_key=True,
+        primary_key=True,  # therefore, not using _api()
     )
 
-    #_api.add_field('revisions')  # TODO
+    _api.add_related('revisions')
 
     def get_latest_revision(self, *, raise_if_none=True):
         """Fetch the latest revision of this submission.

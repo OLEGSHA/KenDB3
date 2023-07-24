@@ -91,7 +91,7 @@ two fields: `my_field` in the default '*' group, and `fav_pizza` in groups
     {'id': 123, 'make': 'Batmobile', 'color_rgb': [0, 0, 0]}
     >>> myCar.api_serialize('looks')
     {'id': 123, 'design_desc': 'Looks cool.', 'color_rgb': [0, 0, 0]}
-    >>> t34 = Car.api_deserialize({'id': 456, 'make': 'Soviet tank T-34' })
+    >>> t34 = Car.api_deserialize({'id': 456, 'make': 'Soviet tank T-34'})
     >>> t34
     <Car: Car object (456)>
     >>> t34.make
@@ -106,6 +106,8 @@ implemented by using fields with `_id` suffix if they exist.
 
 Note that fields are set in the order of their registration.
 """
+
+import builtins
 
 from django.db import models
 
@@ -125,10 +127,6 @@ def api_model(cls):
     return cls
 
 
-_builtin_property = property
-"""Alias to remove ambiguity with method `_Registrar.property`."""
-
-
 class _Registrar:
     """An object used to mark fields."""
 
@@ -138,7 +136,7 @@ class _Registrar:
         api_engine._request(self, groups)
 
     def __call__(self, field):
-        if isinstance(field, _builtin_property):
+        if isinstance(field, builtins.property):
             raise TypeError("Use @_api().property, not @_api() @property")
         self.api_engine(field, self.groups)
 
@@ -150,13 +148,13 @@ class _Registrar:
 
     def property(self, getter):
         """Return a property attribute that is marked as an API field."""
-        if isinstance(getter, _builtin_property):
+        if isinstance(getter, builtins.property):
             raise TypeError(
                 "Don't use @property together with @_api().property")
 
         registrar = self
 
-        class _APIProperty(_builtin_property):
+        class _APIProperty(builtins.property):
             """Helps keep track of property mutations.
 
             Each use of property.getter, property.setter or property.deleter
@@ -166,21 +164,21 @@ class _Registrar:
             """
 
             def getter(self, getter_fn):
-                return self._update(_builtin_property.getter(self, getter_fn))
+                return self._update(builtins.property.getter(self, getter_fn))
             def setter(self, setter_fn):
-                return self._update(_builtin_property.setter(self, setter_fn))
+                return self._update(builtins.property.setter(self, setter_fn))
             def deleter(self, deleter_fn):
-                return self._update(_builtin_property.deleter(self, deleter_fn))
+                return self._update(builtins.property.deleter(self, deleter_fn))
 
             def _update(self, new_instance):
                 request.find_by = new_instance
                 return new_instance
 
             def __repr__(self):
-                spr = _builtin_property.__repr__(self)
+                spr = builtins.property.__repr__(self)
                 return f"{registrar}.property({spr})"
             def __str__(self):
-                spr = _builtin_property.__str__(self)
+                spr = builtins.property.__str__(self)
                 return f"{registrar}.property({spr})"
 
         first_wrapper = _APIProperty(getter)

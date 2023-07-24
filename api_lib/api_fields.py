@@ -136,11 +136,6 @@ class _Registrar:
         self.api_engine = api_engine
         api_engine._request(self, groups=groups)
 
-    def __call__(self, field):
-        if isinstance(field, builtins.property):
-            raise TypeError("Use @_api().property, not @_api() @property")
-        self.api_engine(field, self.groups)
-
     def __repr__(self):
         return '@_api(' + ', '.join(repr(g) for g in self.groups) + ')'
 

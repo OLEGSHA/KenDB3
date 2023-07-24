@@ -357,10 +357,12 @@ def _determine_field_meta(cls, name):
     attribute = getattr(cls, name)
 
     # Check for foreign keys and use object IDs instead
-    if isinstance(attribute, models.ForeignKey):
-        return FieldMeta(f"{name}_id")
-    elif isinstance(attribute, models.OneToOneField):
-        return FieldMeta(f"{name}_id")
+    if hasattr(attribute, 'field'):
+        django_field = attribute.field
+        if isinstance(django_field, models.ForeignKey):
+            return FieldMeta(django_field.attname)
+        elif isinstance(django_field, models.OneToOneField):
+            return FieldMeta(django_field.attname)
 
     # Check for RelatedManager
     if hasattr(attribute, 'related_manager_cls'):

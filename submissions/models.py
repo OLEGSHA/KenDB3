@@ -138,8 +138,17 @@ class SubmissionRevision(models.Model):
         blank=False,
     )
 
-    #authors: _api('*', 'basic')  # TODO
-    #playtesters: _api()  # TODO
+    authors: _api('*', 'basic') = models.ManyToManyField(
+        help_text=('Users that should be credited as map authors.'),
+        to='profiles.Profile',
+        related_name='authored_revisions',
+    )
+
+    playtesters: _api('*') = models.ManyToManyField(
+        help_text=('Users that should be credited as playtesters.'),
+        to='profiles.Profile',
+        related_name='playtested_revisions',
+    )
 
     submitted_by: _api() = models.ForeignKey(
         help_text=('User that submitted this revision.'),

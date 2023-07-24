@@ -16,17 +16,19 @@ class MinecraftVersion(models.Model):
     )
 
     family: _api() = models.SmallIntegerField(
-        help_text=('Family of versions comparable by `comparator`.'),
+        help_text=('Family of versions comparable by '
+                   '<code>comparator</code>.'),
         choices=[
             (1, 'JE'),
             (2, 'BE'),
             (3, 'Other'),
         ],
         blank=False,
+        default=1,
     )
 
     display_name: _api() = models.CharField(
-        help_text=("Displayed user-friendly name like 'JE 1.19.4'."
+        help_text=('Displayed user-friendly name like <code>JE 1.19.4</code>.'
                    'Plain text, HTML will be escaped.'),
         max_length=32,
         blank=False,
@@ -80,15 +82,24 @@ class Submission(models.Model):
         primary_key=True,
     )
 
-    #_api.add_field('submission_revision_set')  # TODO
+    #_api.add_field('revisions')  # TODO
 
-    def get_latest_revision(self):
-        return max(self.submissionrevision_set.all(),
-                   key=lambda r: r.submitted_at,
-                   default=None)
+    def get_latest_revision(self, *, raise_if_none=True):
+        """Fetch the latest revision of this submission.
+
+        For submissions with no revisions, if raise_if_none is not False, raise
+        a ValueError; return None otherwise.
+        """
+        rev_or_none = max(self.revisions.all(),
+                          key=lambda r: r.submitted_at,
+                          default=None)
+        if rev_or_none is None and raise_if_none:
+            raise ValueError('No revisions found for submission '
+                             f"#{self.submission_id}")
+        return rev_or_none
 
     def __str__(self):
-        latest = self.get_latest_revision()
+        latest = self.get_latest_revision(raise_if_none=False)
         if latest:
             if latest.name:
                 name = repr(latest.name)
@@ -110,6 +121,7 @@ class SubmissionRevision(models.Model):
         help_text=('Submission this object is a revision of.'),
         to=Submission,
         on_delete=models.CASCADE,
+        related_name='revisions',
     )
 
     name: _api('*', 'basic') = models.CharField(
@@ -120,7 +132,7 @@ class SubmissionRevision(models.Model):
     )
 
     revision_string: _api('*', 'basic') = models.CharField(
-        help_text=("Version string, e.g. '1.0.3'. "
+        help_text=('Version string, e.g. <code>1.0.3</code>. '
                    'Plain text, HTML will be escaped.'),
         max_length=16,
         blank=False,
@@ -147,7 +159,7 @@ class SubmissionRevision(models.Model):
     minecraft_version_max: _api('*', 'basic') = models.ForeignKey(
         help_text=('Newest Minecraft version supported. '
                    'Must be comparable with, and greater than or equal to '
-                   'minecraft_version_min.'),
+                   '<code>minecraft_version_min</code>.'),
         to=MinecraftVersion,
         on_delete=models.PROTECT,
         db_index=False,
@@ -157,7 +169,7 @@ class SubmissionRevision(models.Model):
     minecraft_version_min: _api('*', 'basic') = models.ForeignKey(
         help_text=('Oldest Minecraft version supported. '
                    'Must be comparable with, and less than or equal to '
-                   'minecraft_version_max.'),
+                   '<code>minecraft_version_max</code>.'),
         to=MinecraftVersion,
         on_delete=models.PROTECT,
         db_index=False,
@@ -167,11 +179,21 @@ class SubmissionRevision(models.Model):
     #tags: _api('*', 'basic') = TagManager  # TODO
 
     download_url: _api() = models.CharField(
-        help_text=("Download URL starting with 'http[s]://' or "
+        help_text=('Download URL starting with <code>http[s]://</code> or '
                    'a human-readable explanation. '
                    'HTML will be retained for non-URL values.'),
         max_length=256,
         blank=False,
+    )
+
+    intended_solution_url: _api() = models.CharField(
+        help_text=('Video URL of the intended solution starting with '
+                   '<code>http[s]://</code> or '
+                   'a human-readable explanation. '
+                   'Blank if none available. '
+                   'HTML will be retained for non-URL values.'),
+        max_length=256,
+        blank=True,
     )
 
     rules: _api() = models.JSONField(

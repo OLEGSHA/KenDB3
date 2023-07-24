@@ -46,3 +46,6 @@ class Profile(models.Model):
         elif Profile._display_name_pattern.fullmatch(value) is None:
             raise ValueError(f"Display name contains illegal characters")
         self.user.first_name = value
+
+    def __str__(self):
+        return f"@{self.user.username} ({self.display_name})"

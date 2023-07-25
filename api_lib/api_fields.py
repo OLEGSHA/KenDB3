@@ -112,6 +112,8 @@ from collections import namedtuple
 
 from django.db import models
 
+from taggit.managers import _TaggableManager
+
 
 def api_model(cls):
     """Create API methods and classmethods in cls.
@@ -364,6 +366,10 @@ def _determine_field_meta(cls, name):
         elif isinstance(django_field, models.OneToOneField):
             return FieldMeta(django_field.attname)
 
+    # Check for TaggableManager
+    if isinstance(attribute, _TaggableManager):
+        return FieldMeta(name, _taggable_manager_get, _taggable_manager_set)
+
     # Check for RelatedManager
     if hasattr(attribute, 'related_manager_cls'):
         return FieldMeta(name, _related_manager_get, _related_manager_set)
@@ -380,6 +386,14 @@ def _related_manager_set(obj, name, value):
     manager = getattr(obj, name)
     objects = manager.model.objects.filter(pk__in=value)
     manager.set(objects)
+
+
+def _taggable_manager_get(obj, name):
+    return list(getattr(obj, name).names())
+
+
+def _taggable_manager_set(obj, name, value):
+    return getattr(obj, name).set(value)
 
 
 def _api_serialize_impl(self, group='*'):

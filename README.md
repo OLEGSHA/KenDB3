@@ -52,6 +52,7 @@ Project is not production-ready yet. Migrations will be committed once the code 
 
 - [Django](https://djangoproject.com/) 4.2
 - [django-environ](https://pypi.org/project/django-environ/) – override settings.py with environment variables
+- [django-taggit](https://pypi.org/project/django-taggit/) – tag management
 
 ## License and reuse
 

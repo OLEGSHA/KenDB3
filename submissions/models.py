@@ -2,6 +2,8 @@
 
 from django.db import models
 
+from taggit.managers import TaggableManager
+
 from api_lib.api_fields import api_model, APIEngine
 
 
@@ -185,7 +187,10 @@ class SubmissionRevision(models.Model):
         related_name='+',
     )
 
-    #tags: _api('*', 'basic') = TagManager  # TODO
+    tags: _api('*', 'basic') = TaggableManager(
+        help_text=('A comma-separated list of tags like '
+                   '<code>retracted</code> or <code>custom-mechanics</code>.'),
+    )
 
     download_url: _api() = models.CharField(
         help_text=('Download URL starting with <code>http[s]://</code> or '

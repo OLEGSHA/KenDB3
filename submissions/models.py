@@ -149,27 +149,33 @@ class SubmissionRevision(models.Model):
         help_text=('Users that should be credited as map authors.'),
         to='profiles.Profile',
         related_name='authored_revisions',
+        blank=False,
     )
 
     playtesters: _api('*') = models.ManyToManyField(
         help_text=('Users that should be credited as playtesters.'),
         to='profiles.Profile',
         related_name='playtested_revisions',
+        blank=True,
     )
 
     submitted_by: _api() = models.ForeignKey(
         help_text=('User that submitted this revision.'),
         to='profiles.Profile',
         on_delete=models.PROTECT,
+        related_name='submitted_revisions',
+        blank=False,
     )
 
     submitted_at: _api() = models.DateTimeField(
         help_text=('Timestamp of the submission message.'),
+        blank=False,
     )
 
     added_at: _api() = models.DateTimeField(
         help_text=('First time the revision was added to the database.'),
         auto_now_add=True,
+        blank=False,
     )
 
     minecraft_version_max: _api('*', 'basic') = models.ForeignKey(
@@ -228,21 +234,25 @@ class SubmissionRevision(models.Model):
         help_text=('Rules, permissions and other important remarks players '
                    'should read before playing. '
                    '[Format to be decided].'),  # TODO
+        blank=True,
     )
 
     author_notes: _api() = models.TextField(
         help_text=('Less important notes interested players may want to read.'
                    'Unsanitized HTML-disabled Markdown.'),
+        blank=True,
     )
 
     changelog: _api() = models.TextField(
         help_text=('Summary of changes in this revision.'
                    'Unsanitized HTML-disabled Markdown.'),
+        blank=True,
     )
 
     editors_comment: _api() = models.TextField(
         help_text=("Database editors' comments on the submission."
                    'Unsanitized HTML-disabled Markdown.'),
+        blank=True,
     )
 
     def __str__(self):

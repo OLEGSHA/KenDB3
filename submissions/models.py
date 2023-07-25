@@ -1,10 +1,15 @@
 """Submissions, submission revisions and Minecraft versions."""
 
 from django.db import models
+from django.core.validators import URLValidator
 
 from taggit.managers import TaggableManager
 
 from api_lib.api_fields import api_model, APIEngine
+
+
+URL_MAX_LENGTH = 256
+URL_VALIDATOR = URLValidator(schemes=['http', 'https'])
 
 
 @api_model
@@ -196,8 +201,17 @@ class SubmissionRevision(models.Model):
         help_text=('Download URL starting with <code>http[s]://</code> or '
                    'a human-readable explanation. '
                    'HTML will be retained for non-URL values.'),
-        max_length=256,
+        max_length=URL_MAX_LENGTH,
         blank=False,
+    )
+
+    demo_url: _api() = models.URLField(
+        help_text=('Video URL of a demo or trailer starting with '
+                   '<code>http[s]://</code>. '
+                   'Blank if none available.'),
+        max_length=URL_MAX_LENGTH,
+        validators=[URL_VALIDATOR],
+        blank=True,
     )
 
     intended_solution_url: _api() = models.CharField(
@@ -206,7 +220,7 @@ class SubmissionRevision(models.Model):
                    'a human-readable explanation. '
                    'Blank if none available. '
                    'HTML will be retained for non-URL values.'),
-        max_length=256,
+        max_length=URL_MAX_LENGTH,
         blank=True,
     )
 

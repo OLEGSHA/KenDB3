@@ -84,7 +84,7 @@ class Submission(models.Model):
 
     _api = APIEngine()
 
-    submission_id = models.SmallIntegerField(
+    submission_id = models.PositiveIntegerField(
         help_text=('Submission ID shown to visitors.'),
         primary_key=True,  # therefore, not using _api()
     )

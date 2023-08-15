@@ -47,6 +47,14 @@ DATABASES = {
 }
 
 
+# Suppressions
+SILENCED_SYSTEM_CHECKS = [
+    'staticfiles.W004',  # There are no non-generated files in ./static/, so
+                         # `makemigrations` and `migrate` complain after fresh
+                         # git clone.
+]
+
+
 # (Here be dragons)
 # Application definition
 

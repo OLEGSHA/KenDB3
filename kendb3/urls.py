@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('api/v0/', include('profiles.urls')),
-    path('api/v0/', include('submissions.urls')),
+    path('', include('profiles.urls')),
+    path('', include('submissions.urls')),
     path('admin/', admin.site.urls),
 ]

@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.views.decorators.http import require_safe
 
 from submissions.models import Submission, SubmissionRevision, MinecraftVersion
@@ -49,3 +50,8 @@ def revision_of_submission(request, submission_id, revision_string):
             revision_string=revision_string,
         ).api_serialize(group)
     )
+
+
+@require_safe
+def page(request):
+    return render(request, "submissions/index.html")

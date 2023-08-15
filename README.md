@@ -10,7 +10,7 @@ KenDB3 is a web application – as much processing as reasonable should happen o
 
 KenDB3 will use Django as backend, with a REST-like API to access most of the data.
 
-Frontend will be hand-written HTML, CSS and JavaScript. Basic backend preprocessing of CSS and JavaScript is being considered.
+Frontend will not use any frameworks. A basic NPM and Webpack pipeline will be used.
 
 The site will be deployed using docker-compose. It will use PostgreSQL as its production database.
 
@@ -31,6 +31,9 @@ cd KenDB3
 # Install Python packages
 pip3 install -r requirements.txt
 
+# Install JavaScript packages
+npm install
+
 # Configure development database (see below)
 python3 manage.py makemigrations
 python3 manage.py migrate
@@ -39,6 +42,7 @@ python3 manage.py migrate
 Run a development server with a SQLite3 database:
 
 ```bash
+npm run build &&  # Rebuild JS bundles manually - WIP
 python3 manage.py runserver
 ```
 

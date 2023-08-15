@@ -51,6 +51,8 @@ DATABASES = {
 # Application definition
 
 INSTALLED_APPS = [
+    'javascript_pipeline.apps.JavascriptPipelineConfig',
+    'viewmodule.apps.ViewmoduleConfig',
     'profiles.apps.ProfilesConfig',
     'submissions.apps.SubmissionsConfig',
     'taggit',
@@ -128,6 +130,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

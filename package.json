@@ -1,0 +1,20 @@
+{
+  "name": "kendb3-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for KenDB3.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch"
+  },
+  "author": "OLEGSHA <kvadropups@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "devDependencies": {
+    "@babel/core": "^7.22.10",
+    "@babel/preset-env": "^7.22.10",
+    "babel-loader": "^9.1.3",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}

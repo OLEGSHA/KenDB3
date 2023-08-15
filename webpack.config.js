@@ -25,4 +25,13 @@ module.exports = {
       },
     ],
   },
+  cache: {
+    /*
+     * Using filesystem cache can cause CI problems, e.g.
+     *   https://github.com/webpack/webpack/issues/13291
+     *
+     * Source: https://stackoverflow.com/a/71599521/4463352
+     */
+    type: 'filesystem',
+  },
 };

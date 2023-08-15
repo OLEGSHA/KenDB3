@@ -42,7 +42,6 @@ python3 manage.py migrate
 Run a development server with a SQLite3 database:
 
 ```bash
-npm run build &&  # Rebuild JS bundles manually - WIP
 python3 manage.py runserver
 ```
 

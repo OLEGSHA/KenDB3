@@ -52,11 +52,15 @@ See [Django 4.2 documentation](https://docs.djangoproject.com/en/4.2/) for more 
 
 Project is not production-ready yet. Migrations will be committed once the code is deployed on windcorp.ru.
 
-## Libraries
+## Dependencies
 
-- [Django](https://djangoproject.com/) 4.2
-- [django-environ](https://pypi.org/project/django-environ/) – override settings.py with environment variables
-- [django-taggit](https://pypi.org/project/django-taggit/) – tag management
+- **Backend**: [Django](https://djangoproject.com/) 4.2
+  - [django-environ](https://pypi.org/project/django-environ/) – override settings.py with environment variables
+  - [django-taggit](https://pypi.org/project/django-taggit/) – tag management
+- **Frontend**:
+  - [NPM](https://npmjs.com) – package management for frontend
+  - [Webpack](https://webpack.js.org/) – resource bundling for frontend
+  - [Babel](https://babeljs.io) – resource preprocessing for frontend
 
 ## License and reuse
 

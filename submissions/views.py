@@ -53,5 +53,5 @@ def revision_of_submission(request, submission_id, revision_string):
 
 
 @require_safe
-def page(request):
+def page(request, subpath=''):
     return render(request, "submissions/index.html")

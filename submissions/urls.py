@@ -6,6 +6,9 @@ urlpatterns = [
     path('submissions/',
          views.page),
 
+    path('submissions/<path:subpath>',
+         views.page),
+
     path('api/v0/submissions/',
          views.submissions),
 

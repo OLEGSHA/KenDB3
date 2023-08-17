@@ -31,7 +31,7 @@ cd KenDB3
 # Install Python packages
 pip3 install -r requirements.txt
 
-# Install JavaScript packages
+# Install frontend packages
 npm install
 
 # Configure development database (see below)
@@ -57,9 +57,9 @@ Project is not production-ready yet. Migrations will be committed once the code 
   - [django-environ](https://pypi.org/project/django-environ/) – override settings.py with environment variables
   - [django-taggit](https://pypi.org/project/django-taggit/) – tag management
 - **Frontend**:
-  - [NPM](https://npmjs.com) – package management for frontend
-  - [Webpack](https://webpack.js.org/) – resource bundling for frontend
-  - [Babel](https://babeljs.io) – resource preprocessing for frontend
+  - [NPM](https://npmjs.com) – package management
+  - [Webpack](https://webpack.js.org/) – resource bundling
+  - [Babel](https://babeljs.io) – resource preprocessing
 
 ## License and reuse
 

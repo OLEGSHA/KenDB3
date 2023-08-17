@@ -30,10 +30,10 @@ export interface Viewmodule {
     /**
      * Appends viewmodule contents to the empty element root.
      *
-     * @param {HTMLElement} root the element to populate. Root is empty.
-     * @param {string} subpath current subpath
+     * @param root the element to populate. Root is empty.
+     * @param subpath current subpath
      *
-     * @returns {Object} An Object.
+     * @returns An Object.
      *          Property title contains the new title for the page.
      */
     install(root: HTMLElement, subpath: string): {title: string};
@@ -68,7 +68,7 @@ export class ViewmoduleManager {
     /**
      * Initialize viewmodules and install viewmodule based on current location.
      *
-     * @param {Map<string, Viewmodule>} moduleMap a viewmodule mapping with
+     * @param moduleMap a viewmodule mapping with
      *        subpaths (specified as '/apple') as keys. A viewmodule can be
      *        mapped to multiple subpaths.
      *

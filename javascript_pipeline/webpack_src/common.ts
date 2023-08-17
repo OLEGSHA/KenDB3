@@ -26,7 +26,7 @@ export function debug(...args: any[]): void {
  * Use like so:
  *   const x: number = foo() ?? wasNull('foo()');
  *
- * @throws {Error} - always
+ * @throws {Error} always
  */
 export function wasNull(what: string): never {
     throw new Error(`${what} is null`);

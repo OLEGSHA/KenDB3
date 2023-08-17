@@ -63,7 +63,7 @@ export class ViewmoduleManager {
     /**
      * Mapping from subpaths to viewmodules.
      */
-    private registry: Map<string, Viewmodule>;
+    private registry: Map<string, Viewmodule> = new Map();
 
     /**
      * Initialize viewmodules and install viewmodule based on current location.
@@ -79,16 +79,12 @@ export class ViewmoduleManager {
         this._root = document.getElementById('viewmodule-root')
             ?? wasNull('#viewmodule-root');
 
-        this.registry = new Map(moduleMap);
-
-        // Check module map
+        // Register all subpaths
+        for (const [subpath, viewmodule] of moduleMap) {
+            this.register(subpath, viewmodule);
+        }
         if (this.registry.size == 0) {
             throw new Error('No subpaths provided');
-        }
-        for (const subpath of this.registry.keys()) {
-            if (!subpath.startsWith('/')) {
-                throw new Error(`'${subpath}' does not begin with a '/'`);
-            }
         }
 
         // Determine base
@@ -205,6 +201,35 @@ export class ViewmoduleManager {
      */
     get installedSubpath(): string | null {
         return this._installedSubpath;
+    }
+
+    /**
+     * Register a new viewmodule for given subpath.
+     *
+     * @param subpath the subpath to assign the viewmodule to
+     * @param viewmodule the viewmodule to register
+     *
+     * @throws {Error} if subpath is invalid or if it is already registered.
+     */
+    register(subpath: string, viewmodule: Viewmodule): void {
+        // Check for subpath validity
+        if (!subpath.startsWith('/')) {
+            throw new Error(`Subpath '${subpath}' is invalid: `
+                            + "does not start with '/'");
+        }
+        for (const badChar of ['#', '?', '@']) {
+            if (subpath.includes(badChar)) {
+                throw new Error(`Subpath '${subpath}' is invalid: `
+                                + `contains '${badChar}'`);
+            }
+        }
+
+        // Check for duplicates
+        if (this.registry.has(subpath)) {
+            throw new Error(`Subpath '${subpath}' is already registered`);
+        }
+
+        this.registry.set(subpath, viewmodule);
     }
 
     /**

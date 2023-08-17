@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "isolatedModules": true,
+    "esModuleInterop": true
+  },
+  "include": ["*/webpack_src/**/*.ts", "*/webpack_src/**/*.d.ts"],
+  "exclude": ["node_modules"]
+}

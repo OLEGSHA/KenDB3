@@ -6,25 +6,25 @@ const as_path = (subpath) => path.resolve(__dirname, subpath);
 module.exports = (env, argv) => {
   return {
     entry: {
-      submissions: './submissions/webpack_src/submissions.js',
+      submissions: './submissions/webpack_src/submissions.ts',
     },
     output: {
       filename: '[name].bundle.js',
       path: as_path('static/bundles'),
     },
     resolve: {
+      extensions: ['.js', '.ts'],
       alias: {
-        common: as_path('javascript_pipeline/webpack_src/common.js'),
-        viewmodule: as_path('viewmodule/webpack_src/viewmodule.js'),
+        common: as_path('javascript_pipeline/webpack_src/common.ts'),
+        viewmodule: as_path('viewmodule/webpack_src/viewmodule.ts'),
       },
     },
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.(js|ts)$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
-          options: { presets: ['@babel/preset-env'] },
         },
       ],
     },

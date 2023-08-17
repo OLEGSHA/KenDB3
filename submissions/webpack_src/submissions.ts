@@ -1,8 +1,8 @@
 import { Viewmodule, ViewmoduleManager } from 'viewmodule';
 
-class HelloWorldModule extends Viewmodule {
+class HelloWorldModule implements Viewmodule {
 
-    install(root, subpath) {
+    install(root: HTMLElement, subpath: string): { title: string } {
         const me = subpath.substring('/hello_'.length);
         root.innerHTML = `
             <h1>I am ${me}</h1>
@@ -26,6 +26,12 @@ class HelloWorldModule extends Viewmodule {
         }
     }
 
+}
+
+declare global {
+    interface Window {
+        viewmoduleManager: ViewmoduleManager | null
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

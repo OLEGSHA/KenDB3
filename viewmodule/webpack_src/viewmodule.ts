@@ -18,21 +18,26 @@
  * 'viewmodule-root', also known as 'viewmodule root'.
  */
 
-import { debug } from 'common'
+import { debug, wasNull } from 'common'
 
 /**
  * A viewmodule.
  *
  * Viewmodules need to implement method install.
- *
- * install(root, subpath)
- *   Appends viewmodule contents to the empty element root.
- *   @-param {HTMLElement} root the element to populate. Root is empty.
- *   @-param {String} subpath current subpath
- *   @-returns An Object. Property title contains the new title for the page.
  */
-export class Viewmodule {
-    // Empty
+export interface Viewmodule {
+
+    /**
+     * Appends viewmodule contents to the empty element root.
+     *
+     * @param {HTMLElement} root the element to populate. Root is empty.
+     * @param {string} subpath current subpath
+     *
+     * @returns {Object} An Object.
+     *          Property title contains the new title for the page.
+     */
+    install(root: HTMLElement, subpath: string): {title: string};
+
 }
 
 /**
@@ -43,109 +48,114 @@ export class ViewmoduleManager {
     /**
      * Root HTMLElement.
      */
-    #_root = null;
+    private _root: HTMLElement;
 
     /**
      * Base path.
      */
-    #_base = null;
+    private _base: string;
 
     /**
      * Last installed subpath or null.
      */
-    #_installedSubpath = null;
+    private _installedSubpath: string | null = null;
 
     /**
      * Mapping from subpaths to viewmodules.
      */
-    #registry = null;
+    private registry: Map<string, Viewmodule>;
 
     /**
      * Initialize viewmodules and install viewmodule based on current location.
      *
-     * @param {Map<String, Viewmodule>} moduleMap a viewmodule mapping with
+     * @param {Map<string, Viewmodule>} moduleMap a viewmodule mapping with
      *        subpaths (specified as '/apple') as keys. A viewmodule can be
      *        mapped to multiple subpaths.
      *
      * @throws {Error} if moduleMap is empty, any subpath is malformed, or if
      *         current location does not correspond to any path.
      */
-    constructor(moduleMap) {
-        this.#_root = document.getElementById('viewmodule-root');
-        this.#registry = new Map(moduleMap);
+    constructor(moduleMap: Map<string, Viewmodule>) {
+        this._root = document.getElementById('viewmodule-root')
+            ?? wasNull('#viewmodule-root');
+
+        this.registry = new Map(moduleMap);
 
         // Check module map
-        if (this.#registry.size == 0) {
+        if (this.registry.size == 0) {
             throw new Error('No subpaths provided');
         }
-        for (const [subpath, viewmodule] of this.#registry) {
+        for (const subpath of this.registry.keys()) {
             if (!subpath.startsWith('/')) {
                 throw new Error(`'${subpath}' does not begin with a '/'`);
-            }
-            if (!(viewmodule instanceof Viewmodule)) {
-                throw new TypeError(`${viewmodule} is not a Viewmodule`);
             }
         }
 
         // Determine base
         const path = getCurrentPath();
-        for (const [subpath, viewmodule] of this.#registry) {
+        let base: string | null = null;
+        for (const [subpath, viewmodule] of this.registry) {
             if (path.endsWith(subpath)) {
-                this.#_base = path.substring(0, path.length - subpath.length);
+                base = path.substring(0, path.length - subpath.length);
                 break;
             }
         }
-        if (this.base == null) {
+        if (base == null) {
             throw new Error(`Path '${path}' did not match any registration`);
         }
+        this._base = base;
 
         // Setup listeners
         document.addEventListener('click',
-            this.#handleClickEvent.bind(this));
+            this.handleClickEvent.bind(this));
 
         window.addEventListener('popstate',
-            this.#handlePopstateEvent.bind(this));
+            this.handlePopStateEvent.bind(this));
 
         debug('ViewmoduleManager initialized with base', this.base,
               ', root ', this.root,
-              'and registered modules', this.#registry);
+              'and registered modules', this.registry);
 
         // Initialize root
         this.install();
     }
 
-    #handlePopstateEvent(event) {
+    private handlePopStateEvent(event: PopStateEvent): void {
         this.install();
     }
 
-    #handleClickEvent(event) {
+    private handleClickEvent(event: MouseEvent): void {
         // Determine destination
-        let href = null;
-        let element = event.target;
-        while (true) {
-            if (!(element instanceof HTMLElement)) {
-                // Weird target or click not on anchor or button
-                return;
-            } else if (element instanceof HTMLAnchorElement) {
-                href = element.href;
-                break;
-            } else if (element instanceof HTMLButtonElement
-                       && 'href' in element.dataset) {
-                href = element.dataset['href'];
-                break;
-            }
+        function findDestination(): string | null {
+            let element: any = event.target;
+            while (true) {
+                if (!(element instanceof HTMLElement)) {
+                    // Weird target or click not on anchor or button
+                    return null;
+                } else if (element instanceof HTMLAnchorElement) {
+                    return element.href;
+                } else if (element instanceof HTMLButtonElement
+                        && 'href' in element.dataset) {
+                    return '' + element.dataset['href'];
+                }
 
-            element = element.parentElement;
+                element = element.parentElement;
+            }
+        }
+        const href = findDestination();
+        if (href === null) {
+            return;
         }
 
+
         // Determine if destination is relevant
-        const hrefUrl = new URL(href, window.location);
+        const hrefUrl = new URL(href, window.location.href);
         const path = hrefUrl.origin + hrefUrl.pathname;
         if (!path.startsWith(this.base)) {
             return;
         }
         const subpath = path.substring(this.base.length);
-        const viewmodule = this.#registry.get(subpath);
+        const viewmodule = this.registry.get(subpath);
         if (viewmodule === undefined) {
             return;
         }
@@ -161,15 +171,15 @@ export class ViewmoduleManager {
     /**
      * Return the HTML element that is filled by viewmodules.
      */
-    get root() {
-        return this.#_root;
+    get root(): HTMLElement {
+        return this._root;
     }
 
     /**
      * Return the base path.
      */
-    get base() {
-        return this.#_base;
+    get base(): string {
+        return this._base;
     }
 
     /**
@@ -180,7 +190,7 @@ export class ViewmoduleManager {
      *
      * @throws {Error} in case the subpath could not be extracted.
      */
-    get currentSubpath() {
+    get currentSubpath(): string {
         const path = getCurrentPath();
         if (path.startsWith(this.base)) {
             return path.substring(this.base.length);
@@ -193,8 +203,8 @@ export class ViewmoduleManager {
     /**
      * Return the subpath for which a viewmodule was last installed, or null.
      */
-    get installedSubpath() {
-        return this.#_installedSubpath;
+    get installedSubpath(): string | null {
+        return this._installedSubpath;
     }
 
     /**
@@ -202,28 +212,26 @@ export class ViewmoduleManager {
      *
      * Behavior is undefined when current subpath is not registered.
      */
-    install() {
+    install(): void {
         // Wipe root
         const root = this.root;
         while (root.firstChild) {
-            root.removeChild(root.lastChild);
+            root.removeChild(root.lastChild as Node);
         }
 
         // Find appropriate viewmodule
         const subpath = this.currentSubpath;
-        const viewmodule = this.#registry.get(subpath);
+        const viewmodule = this.registry.get(subpath);
         if (viewmodule === undefined) {
             throw Error(`No viewmodule registered at subpath '${subpath}'`);
         }
 
         // Install it
         debug('ViewmoduleManager: installing ', viewmodule, 'at', subpath);
-        const {
-            title,
-        } = viewmodule.install(this.root, subpath);
-        this.#_installedSubpath = subpath;
+        const wishes = viewmodule.install(this.root, subpath);
+        this._installedSubpath = subpath;
 
-        document.title = title;
+        document.title = wishes.title;
     }
 
     /**
@@ -232,7 +240,7 @@ export class ViewmoduleManager {
      *
      * Behavior is undefined when current subpath is not registered.
      */
-    installIfNecessary() {
+    installIfNecessary(): void {
         const subpath = this.currentSubpath;
         if (subpath !== this.installedSubpath) {
             this.install();
@@ -244,6 +252,6 @@ export class ViewmoduleManager {
 /**
  * Return the current path.
  */
-function getCurrentPath() {
+function getCurrentPath(): string {
     return window.location.origin + window.location.pathname;
 }

@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "common": ["./javascript_pipeline/webpack_src/common.ts"],
+      "viewmodule": ["./viewmodule/webpack_src/viewmodule.ts"]
+    },
     "target": "esnext",
     "moduleResolution": "node",
     "noEmit": true,

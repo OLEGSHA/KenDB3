@@ -14,10 +14,7 @@ module.exports = (env, argv) => {
     },
     resolve: {
       extensions: ['.js', '.ts'],
-      alias: {
-        common: as_path('javascript_pipeline/webpack_src/common.ts'),
-        viewmodule: as_path('viewmodule/webpack_src/viewmodule.ts'),
-      },
+      alias: yankAliasesFromTsconfig(),
     },
     module: {
       rules: [
@@ -48,3 +45,15 @@ module.exports = (env, argv) => {
     },
   };
 };
+
+function yankAliasesFromTsconfig() {
+  const fs = require('fs');
+  const tsconfig = JSON.parse(fs.readFileSync('./tsconfig.json'));
+  const paths = tsconfig.compilerOptions.paths
+
+  const result = {};
+  for (const alias in paths) {
+    result[alias] = as_path(paths[alias][0]);
+  }
+  return result;
+}

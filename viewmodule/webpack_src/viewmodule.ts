@@ -143,24 +143,9 @@ export class ViewmoduleManager {
             return;
         }
 
-
-        // Determine if destination is relevant
-        const hrefUrl = new URL(href, window.location.href);
-        const path = hrefUrl.origin + hrefUrl.pathname;
-        if (!path.startsWith(this.base)) {
-            return;
-        }
-        const subpath = path.substring(this.base.length);
-        const viewmodule = this.registry.get(subpath);
-        if (viewmodule === undefined) {
-            return;
-        }
-
         // Interject
-        event.preventDefault();
-        if (this.installedSubpath !== subpath) {
-            window.history.pushState(null, '', href);
-            this.install();
+        if (this.go(href)) {
+            event.preventDefault();
         }
     }
 
@@ -270,6 +255,40 @@ export class ViewmoduleManager {
         if (subpath !== this.installedSubpath) {
             this.install();
         }
+    }
+
+    /**
+     * Go to given subpath and install appropriate viewmodule. A history state
+     * is pushed if the subpath is different from current. If href is not
+     * a path handled by this ViewmoduleManager, no action is taken.
+     *
+     * Behavior is undefined when new subpath is not registered.
+     *
+     * @param href the location to install.
+     *
+     * @returns true iff href is a path handled by this ViewmoduleManager.
+     */
+    go(href: string): boolean {
+        // Determine if destination is relevant
+        const hrefUrl = new URL(href, window.location.href);
+        const path = hrefUrl.origin + hrefUrl.pathname;
+        if (!path.startsWith(this.base)) {
+            return false;
+        }
+        const subpath = path.substring(this.base.length);
+        const viewmodule = this.registry.get(subpath);
+        if (viewmodule === undefined) {
+            return false;
+        }
+
+        // Determine if pushState is necessary
+        if (this.installedSubpath !== subpath) {
+            window.history.pushState(null, '', href);
+        }
+
+        this.install();
+
+        return true;
     }
 
 }

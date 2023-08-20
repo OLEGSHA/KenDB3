@@ -18,6 +18,10 @@ class HelloWorldModule implements Viewmodule {
                 <li><a href="hello_foobar">
                         Hoo boy this is gonna be a wild one
                     </a>
+                <li><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juvenile_Ragdoll.jpg/667px-Juvenile_Ragdoll.jpg"
+                         onclick="window.viewmoduleManager.go('hello_spam')"
+                         alt="Kitten photo"
+                         title="Go to spam">
             </ul>
         `;
 

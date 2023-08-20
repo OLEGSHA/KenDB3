@@ -36,7 +36,7 @@ export interface Viewmodule {
      * @returns An Object.
      *          Property title contains the new title for the page.
      */
-    install(root: HTMLElement, subpath: string): {title: string};
+    install(root: HTMLElement, subpath: string): Promise<{title: string}>;
 
 }
 
@@ -44,11 +44,6 @@ export interface Viewmodule {
  * Viewmodule manager class.
  */
 export class ViewmoduleManager {
-
-    /**
-     * Root HTMLElement.
-     */
-    private _root: HTMLElement;
 
     /**
      * Base path.
@@ -63,7 +58,7 @@ export class ViewmoduleManager {
     /**
      * Mapping from subpaths to viewmodules.
      */
-    private registry: Map<string, Viewmodule> = new Map();
+    private registry = new Map<string, Viewmodule>();
 
     /**
      * Initialize viewmodules and install viewmodule based on current location.
@@ -76,9 +71,6 @@ export class ViewmoduleManager {
      *         current location does not correspond to any path.
      */
     constructor(moduleMap: Map<string, Viewmodule>) {
-        this._root = document.getElementById('viewmodule-root')
-            ?? wasNull('#viewmodule-root');
-
         // Register all subpaths
         for (const [subpath, viewmodule] of moduleMap) {
             this.register(subpath, viewmodule);
@@ -153,7 +145,8 @@ export class ViewmoduleManager {
      * Return the HTML element that is filled by viewmodules.
      */
     get root(): HTMLElement {
-        return this._root;
+        return document.getElementById('viewmodule-root')
+            ?? wasNull('#viewmodule-root');
     }
 
     /**
@@ -223,12 +216,6 @@ export class ViewmoduleManager {
      * Behavior is undefined when current subpath is not registered.
      */
     install(): void {
-        // Wipe root
-        const root = this.root;
-        while (root.firstChild) {
-            root.removeChild(root.lastChild as Node);
-        }
-
         // Find appropriate viewmodule
         const subpath = this.currentSubpath;
         const viewmodule = this.registry.get(subpath);
@@ -236,13 +223,30 @@ export class ViewmoduleManager {
             throw Error(`No viewmodule registered at subpath '${subpath}'`);
         }
 
-        // Install it
-        debug('ViewmoduleManager: installing ', viewmodule, 'at', subpath);
-        const wishes = viewmodule.install(this.root, subpath);
-        this._installedSubpath = subpath;
+        // Replace root
+        const newRoot = this.root.cloneNode(false) as HTMLElement;
+        this.root.replaceWith(newRoot);
 
-        document.title = wishes.title;
+        // Install viewmodule
+        debug('ViewmoduleManager: installing ', viewmodule, 'at', subpath);
+        this._installedSubpath = subpath;
+        viewmodule.install(newRoot, subpath)
+            .then((wishes) => {
+                document.title = wishes.title;
+            });
+        if (!newRoot.hasChildNodes()) {
+            this.installLoading();
+        }
     }
+
+    private installLoading(): void {
+        this.root.innerHTML = `
+            <div>
+                Loading <code>${this.installedSubpath}</code>...
+            </div>
+        `;
+    }
+
 
     /**
      * Install the viewmodule appropriate for the current path if subpath has

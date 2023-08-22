@@ -1,4 +1,5 @@
 import { Viewmodule, ViewmoduleManager } from 'viewmodule';
+import { Submission } from 'api_lib';
 
 class HelloWorldModule implements Viewmodule {
 
@@ -9,8 +10,11 @@ class HelloWorldModule implements Viewmodule {
             await new Promise(res => setTimeout(res, 2000));
         }
 
+        const sub = await Submission.objects.get(49);
+
         root.innerHTML = `
             <h1>I am ${me}</h1>
+            <p>Last revision of Submission ${sub.id} is ${sub.latest_revision}
             <ul>
                 <li><a href="hello_spam">Spam</a>
                 <li><a href="hello_lag">Lag</a>

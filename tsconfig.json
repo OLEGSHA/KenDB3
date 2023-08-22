@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "common": ["./javascript_pipeline/webpack_src/common.ts"],
-      "viewmodule": ["./viewmodule/webpack_src/viewmodule.ts"]
+      "viewmodule": ["./viewmodule/webpack_src/viewmodule.ts"],
+      "api_lib": ["./api_lib/webpack_src/api_lib.ts"]
     },
     "target": "esnext",
     "moduleResolution": "node",

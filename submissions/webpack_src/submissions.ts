@@ -14,7 +14,7 @@ class HelloWorldModule implements Viewmodule {
 
         root.innerHTML = `
             <h1>I am ${me}</h1>
-            <p>Last revision of Submission ${sub.id} is ${sub.latest_revision}
+            <p>Revisions of Submission ${sub.id}: [${sub.revisions.join(', ')}]
             <ul>
                 <li><a href="hello_spam">Spam</a>
                 <li><a href="hello_lag">Lag</a>

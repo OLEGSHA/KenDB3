@@ -236,13 +236,15 @@ export class ModelManager<Model extends ModelBase> {
         pendingIds: Iterable<number>,
     ): Promise<void> {
         // TODO error handling
+        if (!response.ok) {
+            throw new Error(`Got status code ${response.status} from API`);
+        }
+
         const data = await response.json();
         const pendingIdsCopy = new Set<number>(pendingIds);
 
-        debug(`Dataman: handleResponse ${this.modelClass.name} [${Array.from(pendingIdsCopy).join(', ')}]`);
-
         // Fill in data and update status of received instances
-        const seenIds = this.doAddData(data, fields);
+        const seenIds = this.doAddData(data.payload as Packet, fields);
 
         for (const id of seenIds) {
             if (pendingIdsCopy.has(id)) {
@@ -271,10 +273,10 @@ export class ModelManager<Model extends ModelBase> {
      *
      * @returns the set of all IDs encountered
      */
-    private doAddData(data: {id: number}[], fields: string): Set<number> {
-        const seenIds = Set<number>();
+    private doAddData(data: Packet, fields: string): Set<number> {
+        const seenIds = new Set<number>();
 
-        for (const instanceData of data) {
+        for (const instanceData of data.instances) {
             const id = instanceData.id;
 
             // Fill in data
@@ -291,6 +293,8 @@ export class ModelManager<Model extends ModelBase> {
             seenIds.add(id);
         }
 
+        debug(`Dataman: doAddData ${this.modelClass.name} [${Array.from(seenIds).join(', ')}]`);
+
         return seenIds;
     }
 
@@ -300,7 +304,7 @@ export class ModelManager<Model extends ModelBase> {
      * @param data an instance array
      * @param fields the fields provided
      */
-    addData(data: {id: number}[], fields: string): void {
+    addData(data: Packet, fields: string): void {
         const added = this.doAddData(data, fields);
         this.eventBus.dispatchEvent(new Event('update'));
     }
@@ -331,6 +335,12 @@ export function manageModel<Model extends ModelBase>(
         = new ModelManager<Model>(modelClass, requestUrl);
 }
 
+type Packet = {
+    instances: {
+        id: number
+    }[],
+};
+
 enum Status {
     NotRequested,
     Pending,
@@ -351,7 +361,7 @@ class ModelBase {
 
     setStatus(fields: string, status: Status) {
         (this as any)['_fields_' + fields] = status;
-        debug(`Dataman: ${this.constructor.name} ID ${this.id}: '${fields}' is now ${status}`);
+        debug(`Dataman: ${this.constructor.name} ID ${this.id}: '${fields}' is now ${Status[status]}`);
     }
 }
 

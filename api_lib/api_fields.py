@@ -109,6 +109,7 @@ Note that fields are set in the order of their registration.
 
 import builtins
 from collections import namedtuple
+import re
 
 from django.db import models
 
@@ -209,6 +210,7 @@ class APIEngine:
     def __init__(self):
         self._requests = []
         self.field_groups = None
+        self.api_name = None
         pass
 
     def __call__(self, *groups):
@@ -303,6 +305,7 @@ class APIEngine:
                 field_groups[group].append(field)
 
         self.field_groups = field_groups
+        self.api_name = re.sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower();
 
     def _get_fields(self, group):
         result = self.field_groups.get(group, None)

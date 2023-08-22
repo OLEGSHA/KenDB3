@@ -35,7 +35,7 @@ export class ModelManager<Model extends ModelBase> {
     private eventBus = new EventTarget();
 
     /**
-     * Full download URL without the `ids` search parameter.
+     * Full download URL without the `ids` and `fields` search parameters.
      */
     private requestUrl: URL;
 
@@ -48,7 +48,7 @@ export class ModelManager<Model extends ModelBase> {
      * Create a ModelManager.
      *
      * @param modelClass model class
-     * @param requestUrl download URL without the `ids` search parameter
+     * @param requestUrl download URL without `ids` or `fields`.
      */
     constructor(
         modelClass: new(id: number) => Model,
@@ -213,6 +213,7 @@ export class ModelManager<Model extends ModelBase> {
 
         const url = new URL(this.requestUrl);
         url.searchParams.append('ids', Array.from(idsToDownload).join(','));
+        url.searchParams.append('fields', fields);
         fetch(url)
             .then((response) => this.handleResponse(
                 response,
@@ -241,13 +242,40 @@ export class ModelManager<Model extends ModelBase> {
         debug(`Dataman: handleResponse ${this.modelClass.name} [${Array.from(pendingIdsCopy).join(', ')}]`);
 
         // Fill in data and update status of received instances
-        for (const instanceData of data as {id: number}[]) {
-            const id = instanceData.id;
+        const seenIds = this.doAddData(data, fields);
 
-            // Sanity check
-            if (!pendingIdsCopy.has(id)) {
+        for (const id of seenIds) {
+            if (pendingIdsCopy.has(id)) {
+                pendingIdsCopy.delete(id);
+            } else {
                 throw new Error('Received instance that was not requested');
             }
+        }
+
+        // Remove pending status for remaining instances
+        for (const id of pendingIdsCopy) {
+            this.getOrCreate(id).setStatus(fields, Status.NotRequested);
+        }
+
+        // Raise event
+        this.eventBus.dispatchEvent(new Event('update'));
+    }
+
+    /**
+     * Add data as if from a download request.
+     *
+     * This method does not fire any events; ensure that events are fired.
+     *
+     * @param data an instance array
+     * @param fields the fields provided
+     *
+     * @returns the set of all IDs encountered
+     */
+    private doAddData(data: {id: number}[], fields: string): Set<number> {
+        const seenIds = Set<number>();
+
+        for (const instanceData of data) {
+            const id = instanceData.id;
 
             // Fill in data
             const instance = this.getOrCreate(id);
@@ -260,15 +288,20 @@ export class ModelManager<Model extends ModelBase> {
 
             // Update status and mark as completed
             instance.setStatus(fields, Status.Available);
-            pendingIdsCopy.delete(id);
+            seenIds.add(id);
         }
 
-        // Remove pending status for remaining instances
-        for (const id of pendingIdsCopy) {
-            this.getOrCreate(id).setStatus(fields, Status.NotRequested);
-        }
+        return seenIds;
+    }
 
-        // Raise event
+    /**
+     * Add data as if from a download request.
+     *
+     * @param data an instance array
+     * @param fields the fields provided
+     */
+    addData(data: {id: number}[], fields: string): void {
+        const added = this.doAddData(data, fields);
         this.eventBus.dispatchEvent(new Event('update'));
     }
 

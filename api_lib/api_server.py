@@ -22,11 +22,16 @@ def failure(message, code=400):
 
 
 def get_models(ids, group, model_class):
-    """Return a frontend data manager payload."""
+    """Return a frontend data manager payload.
+
+    ids can be an iterable or None to get all instances.
+    """
+    query = {'pk__in': set(ids)} if ids is not None else {}
+
     return {
         'instances': [
             instance.api_serialize(group)
-            for instance in model_class.objects.filter(pk__in=set(ids))
+            for instance in model_class.objects.filter(**query)
         ],
     }
 
@@ -45,10 +50,13 @@ def serve_data_manager(request, model_class):
     if {'ids', 'fields'} - request.GET.keys():
         return failure("Invalid request: 'ids' and 'fields' are required")
 
-    try:
-        ids = [int(id) for id in request.GET['ids'].split(',')]
-    except:
-        return failure('Could not decode ids')
+    if request.GET['ids'] == 'all':
+        ids = None
+    else:
+        try:
+            ids = [int(id) for id in request.GET['ids'].split(',')]
+        except:
+            return failure('Could not decode ids')
 
     fields = request.GET['fields']
     if fields not in model_class._api.field_groups:

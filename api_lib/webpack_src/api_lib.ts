@@ -25,9 +25,10 @@ export class ModelManager<Model extends ModelBase> {
     private store = new Map<number, Model>();
 
     /**
-     * Pending dumps.
+     * Status of dumps (requests for all objects from DB).
+     * Dumps not present in this map are assumed to be NotRequested.
      */
-    private dumpsPending = new Set<string>();
+    private dumps = new Map<string, Status>();
 
     /**
      * Event bus for status update events.
@@ -69,11 +70,40 @@ export class ModelManager<Model extends ModelBase> {
     private statusOf(id: number, fields: string): Status {
         const instance = this.store.get(id);
         if (instance === undefined) {
-            return (this.dumpsPending.has(fields)
+            return (this.dumps.get(fields) === Status.Pending
                 ? Status.Pending
                 : Status.NotRequested);
         } else {
             return instance.statusOf(fields);
+        }
+    }
+
+    /**
+     * Return status of specified field dump.
+     *
+     * @param fields the field group to check
+     *
+     * @returns the status
+     */
+    private statusOfDump(fields: string): Status {
+        return this.dumps.get(fields) ?? Status.NotRequested;
+    }
+
+    /**
+     * Sets the status of provided field dump.
+     *
+     * Status of exsting instances is upgraded accordingly.
+     *
+     * @param fields the field group of the dump
+     * @param status the new status
+     */
+    private setStatusOfDump(fields: string, status: Status): void {
+        this.dumps.set(fields, status);
+
+        for (const instance of this.store.values()) {
+            if (instance.statusOf(fields) < status) {
+                instance.setStatus(fields, status);
+            }
         }
     }
 
@@ -94,15 +124,17 @@ export class ModelManager<Model extends ModelBase> {
     }
 
     /**
-     * Return all instances with given IDs. Specified field group will be
+     * Return instances with given IDs. Specified field group will be
      * available.
      *
      * If all requested data is available, method does not block.
      *
      * @param ids the IDs of instances to return
      * @param fields the field group that must be available
+     *
+     * @returns requested models; order is not defined
      */
-    async get_all(
+    async getBulk(
         ids: Iterable<number>,
         fields: string = '*'
     ): Promise<Model[]> {
@@ -111,7 +143,8 @@ export class ModelManager<Model extends ModelBase> {
         // Contains all IDs that are not in map
         const missingIds = new Set<number>(ids);
 
-        debug(`Dataman: get_all ${this.modelClass.name} [${Array.from(missingIds).join(', ')}]`);
+        debug(`Dataman: getBulk ${this.modelClass.name} fields ${fields} IDs`,
+              Array.from(missingIds));
 
         // Request download of any non-Available fields
         this.download(missingIds, fields);
@@ -144,13 +177,7 @@ export class ModelManager<Model extends ModelBase> {
             }
 
             // Wait for more data
-            await new Promise((resolve) => {
-                this.eventBus.addEventListener(
-                    'update',
-                    () => resolve(undefined),
-                    { once: true }
-                );
-            });
+            await this.blockUntilUpdate();
         }
 
         return Array.from(map.values());
@@ -164,13 +191,65 @@ export class ModelManager<Model extends ModelBase> {
      *
      * @param id the ID of instances to return
      * @param fields the field group that must be available
+     *
+     * @returns requested model
      */
     async get(id: number, fields: string = '*'): Promise<Model> {
-        return (await this.get_all([id], fields))[0];
+        return (await this.getBulk([id], fields))[0];
     }
 
     /**
-     * Helper method for get_all(). Returns an Error with detailed description.
+     * Return all instances of this model. Specified field group will be
+     * available.
+     *
+     * If all requested data is available, method does not block.
+     *
+     * @param fields the field group that must be available
+     *
+     * @returns all models; order is not defined
+     */
+    async getAll(fields: string = '*'): Promise<Model[]> {
+        debug(`Dataman: getAll ${this.modelClass.name} fields ${fields}`);
+
+        // Request download
+        if (this.statusOfDump(fields) === Status.NotRequested) {
+            this.downloadAll(fields);
+        }
+
+        while (true) {
+            switch (this.statusOfDump(fields)) {
+
+                case Status.Available:
+                    return Array.from(this.store.values());
+
+                case Status.Pending:
+                    break;
+
+                case Status.NotRequested:
+                    throw new Error(
+                        `Could not download ${this.modelClass.name} dump`);
+
+            }
+
+            await this.blockUntilUpdate();
+        }
+    }
+
+    /**
+     * Blocks until an update occurs.
+     */
+    private async blockUntilUpdate(): Promise<void> {
+        await new Promise((resolve) => {
+            this.eventBus.addEventListener(
+                'update',
+                () => resolve(undefined),
+                { once: true }
+            );
+        });
+    }
+
+    /**
+     * Helper method for getBulk(). Returns an Error with detailed description.
      *
      * @param ids IDs that must not be NotRequested
      * @param fields the field group to check
@@ -209,7 +288,8 @@ export class ModelManager<Model extends ModelBase> {
             return;
         }
 
-        debug(`Dataman: download ${this.modelClass.name} [${Array.from(idsToDownload).join(', ')}]`);
+        debug(`Dataman: download ${this.modelClass.name} `
+              + `fields ${fields} IDs`, Array.from(idsToDownload));
 
         const url = new URL(this.requestUrl);
         url.searchParams.append('ids', Array.from(idsToDownload).join(','));
@@ -224,39 +304,89 @@ export class ModelManager<Model extends ModelBase> {
     }
 
     /**
+     * Download all missing data for requested fields of all instances.
+     *
+     * This method does not block under any circumstances. Due to an API limit-
+     * ation, all data is requested, regardless of current availability inclu-
+     * des only data that is not already available.
+     *
+     * @param fields the field group to download
+     */
+    downloadAll(fields: string): void {
+        this.setStatusOfDump(fields, Status.Pending);
+
+        debug(`Dataman: download ${this.modelClass.name} `
+              + `fields ${fields} dump`);
+
+        const url = new URL(this.requestUrl);
+        url.searchParams.append('ids', 'all');
+        url.searchParams.append('fields', fields);
+        fetch(url)
+            .then((response) => this.handleResponse(
+                response,
+                fields,
+                null,
+            ))
+            .catch((error) => this.handleError(error));
+    }
+
+    /**
      * Handle a raw fetch() response.
      *
      * @param response the Response object
      * @param fields the fields to set
-     * @param pendingIds the IDs that should be made Available or NotRequested
+     * @param pendingIds the IDs that should be made Available or NotRequested,
+     *        or null if handling dump request
      */
     private async handleResponse(
         response: Response,
         fields: string,
-        pendingIds: Iterable<number>,
+        pendingIds: Iterable<number> | null,
     ): Promise<void> {
         // TODO error handling
         if (!response.ok) {
-            throw new Error(`Got status code ${response.status} from API`);
+            response.json()
+                .catch((e) => {
+                    console.error(e);
+                    throw new Error(`Got status code ${response.status} `
+                                    + 'from API, response is not JSON');
+                })
+                .then((json) => {
+                    let msg: string = `Got status code ${response.status} `
+                                      + `from API, `;
+                    if ('status' in json) {
+                        msg += 'message: ' + json.status;
+                    } else {
+                        msg += "response is JSON but 'status' not found";
+                    }
+
+                    throw new Error(msg);
+                });
+            return;
         }
 
         const data = await response.json();
-        const pendingIdsCopy = new Set<number>(pendingIds);
 
         // Fill in data and update status of received instances
         const seenIds = this.doAddData(data.payload as Packet, fields);
 
-        for (const id of seenIds) {
-            if (pendingIdsCopy.has(id)) {
-                pendingIdsCopy.delete(id);
-            } else {
-                throw new Error('Received instance that was not requested');
-            }
-        }
+        if (pendingIds !== null) {
+            // Selective request
 
-        // Remove pending status for remaining instances
-        for (const id of pendingIdsCopy) {
-            this.getOrCreate(id).setStatus(fields, Status.NotRequested);
+            // Remove pending status for remaining instances
+            const pendingIdsCopy = new Set<number>(pendingIds);
+            for (const id of seenIds) {
+                if (pendingIdsCopy.has(id)) {
+                    pendingIdsCopy.delete(id);
+                }
+            }
+            for (const id of pendingIdsCopy) {
+                this.getOrCreate(id).setStatus(fields, Status.NotRequested);
+            }
+
+        } else {
+            // Dump request
+            this.setStatusOfDump(fields, Status.Available);
         }
 
         // Raise event
@@ -293,7 +423,8 @@ export class ModelManager<Model extends ModelBase> {
             seenIds.add(id);
         }
 
-        debug(`Dataman: doAddData ${this.modelClass.name} [${Array.from(seenIds).join(', ')}]`);
+        debug(`Dataman: doAddData ${this.modelClass.name} `
+              + `fields ${fields} IDs`, Array.from(seenIds));
 
         return seenIds;
     }

@@ -16,10 +16,12 @@ class HelloWorldModule implements Viewmodule {
         }
 
         const sub = await Submission.objects.get(49);
+        const all_subs = await Submission.objects.getAll();
 
         root.innerHTML = `
             <h1>I am ${me}</h1>
             <p>Revisions of Submission ${sub.id}: [${sub.revisions.join(', ')}]
+            <p>There are ${all_subs.length} submissions in the DB
             <ul>
                 <li><a href="hello_spam">Spam</a>
                 <li><a href="hello_lag">Lag</a>

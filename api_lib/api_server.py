@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_safe
 
@@ -37,6 +38,48 @@ def get_models(ids, group, model_class):
             for instance in model_class.objects.filter(**query)
         ],
     }
+
+
+def make_injection(*entries):
+    """Create an injectable dict based on provided queries.
+
+    Each argument must be one of:
+        (instances, fields)
+        instances
+    where:
+        instances - an iterable of instances of one model (including QuerySet),
+        fields - the field group to serialize, defaults to '*'
+    """
+    def normalize(e):
+        if isinstance(e, tuple) and len(e) == 2 and isinstance(e[1], str):
+            instances = e[0]
+            group = e[1]
+        else:
+            instances = e
+            group = '*'
+
+        instances = list(instances)
+        if not instances:
+            return None
+        assert len({ type(i) for i in instances }) == 1  # Forbid type mixing
+        return (instances, type(instances[0]), group)
+
+    normalized_entries = [
+        normalized for e in entries if (normalized := normalize(e))
+    ]
+
+    return [
+        {
+            'model': model.__name__,
+            'fields': group,
+            'packet': {
+                'instances': [
+                    instance.api_serialize(group) for instance in instances
+                ]
+            }
+        }
+        for instances, model, group in normalized_entries
+    ]
 
 
 @require_safe

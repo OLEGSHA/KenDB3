@@ -466,7 +466,7 @@ export function manageModel<Model extends ModelBase>(
         = new ModelManager<Model>(modelClass, requestUrl);
 }
 
-type Packet = {
+export type Packet = {
     instances: {
         id: number
     }[],

@@ -1,0 +1,15 @@
+{% extends "common/base.html" %}
+
+{% block head %}
+    {% url "dataman-endpoint" "MODEL_NAME" as dataman_endpoint %}
+    {{ dataman_endpoint|json_script:"dataman-endpoint" }}
+    {{ injected_packets|json_script:"injected-packets" }}
+{% endblock %}
+
+{% block content %}
+    <div id="viewmodule-root"></div>
+    <noscript>
+        JavaScript is required for this page.
+    </noscript>
+    {% block main_script_src %}{% endblock %}
+{% endblock %}

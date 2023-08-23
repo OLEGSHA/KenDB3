@@ -21,13 +21,70 @@ export function debug(...args: any[]): void {
 }
 
 /**
- * Always throws an Error complaining that `what` is null.
+ * Always throws an Error with given message.
  *
  * Use like so:
- *   const x: number = foo() ?? wasNull('foo()');
+ *   const x: number = foo() ?? error('foo() is null');
  *
  * @throws {Error} always
  */
-export function wasNull(what: string): never {
-    throw new Error(`${what} is null`);
+export function error(message: string): never {
+    throw new Error(message);
+}
+
+/**
+ * Get an HTMLElement by its ID or throw an Error.
+ *
+ * @param id the ID to find
+ *
+ * @returns the element
+ * @throws {Error} when element is not found
+ */
+export function getElementByIdOrDie(id: string): HTMLElement {
+    return document.getElementById(id) ?? error(`#${id} not found`);
+}
+
+/**
+ * Cache of loaded injections by former element ID.
+ */
+const loadedInjections = new Map<string, any>();
+
+/**
+ * Get an injected value by its ID.
+ *
+ * Injected values are usually created within Django templates using
+ * {{ somevar|json_script:"injection-id" }}.
+ *
+ * Injected values are loaded once from DOM, after which the element containing
+ * the injection is removed to reduce RAM usage. By default the value is
+ * instead cached in a Map, but function parameter cache can be used to disable
+ * caching and destroy the value forever.
+ *
+ * @param id the ID of the injection element
+ * @param cache when set to false, injection data is deleted permanently
+ *
+ * @return the value loaded from DOM or cache
+ */
+export function getInjection<T>(id: string, cache: boolean = true): T {
+    if (loadedInjections.has(id)) {
+        return loadedInjections.get(id) as T;
+    }
+
+    const element = getElementByIdOrDie(id);
+    if (!(element instanceof HTMLScriptElement)) {
+        throw new Error('Injection must be a script element');
+    }
+    if (element.type !== "application/json") {
+        throw new Error('Injection must have type="application/json"');
+    }
+
+    const value = JSON.parse(element.textContent
+                             ?? error('Injection has no textContent'));
+    element.remove();
+
+    if (cache) {
+        loadedInjections.set(id, value);
+    }
+
+    return value as T;
 }

@@ -39,6 +39,7 @@ class _TypeScriptTemplates:  # namespace
             manageModel,
             Status,
         }} from './api_lib';
+        import {{ getInjection }} from 'common';
 
         /**
          * Create a ModelManager and store it in modelClass.objects.
@@ -52,13 +53,9 @@ class _TypeScriptTemplates:  # namespace
             modelClass: new(id: number) => Model,
             modelAPIName: string,
         ): void {{
-            manageModel(
-                modelClass,
-
-                // TODO inject base URL with Django templates
-                // TODO sync paths with appropriate urls.py
-                new URL('api/v0/get/' + modelAPIName, window.location.origin)
-            );
+            const template = getInjection<string>('dataman-endpoint');
+            const path = template.replace('MODEL_NAME', modelAPIName);
+            manageModel(modelClass, new URL(path, window.location.origin));
         }}
     ''')
 

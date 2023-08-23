@@ -18,7 +18,7 @@
  * 'viewmodule-root', also known as 'viewmodule root'.
  */
 
-import { debug, wasNull } from 'common'
+import { debug, getElementByIdOrDie } from 'common'
 
 /**
  * A viewmodule.
@@ -145,8 +145,7 @@ export class ViewmoduleManager {
      * Return the HTML element that is filled by viewmodules.
      */
     get root(): HTMLElement {
-        return document.getElementById('viewmodule-root')
-            ?? wasNull('#viewmodule-root');
+        return getElementByIdOrDie('viewmodule-root');
     }
 
     /**

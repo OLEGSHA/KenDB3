@@ -1,5 +1,8 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_safe
+
+
+all_models = {}
 
 
 def _api_response(*, status, payload, status_code):
@@ -37,11 +40,13 @@ def get_models(ids, group, model_class):
 
 
 @require_safe
-def serve_data_manager(request, model_class):
-    """Process an API request.
+def serve_data_manager(request, model_name):
+    """Process an API request."""
 
-    Only URL search parameters are validated.
-    """
+    model_class = all_models.get(model_name)
+    if model_class is None:
+        raise Http404('Unknown model')
+
     assert hasattr(model_class, '_api')
 
     if request.GET.keys() - {'ids', 'fields'}:

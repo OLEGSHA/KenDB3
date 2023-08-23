@@ -57,7 +57,7 @@ class _TypeScriptTemplates:  # namespace
 
                 // TODO inject base URL with Django templates
                 // TODO sync paths with appropriate urls.py
-                new URL('api/v0/' + modelAPIName, window.location.origin)
+                new URL('api/v0/get/' + modelAPIName, window.location.origin)
             );
         }}
     ''')

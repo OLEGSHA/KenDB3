@@ -119,6 +119,7 @@ from django.db import models
 from taggit.managers import _TaggableManager
 
 from . import api_autogenerator
+from . import api_server
 
 
 def api_model(cls):
@@ -130,10 +131,13 @@ def api_model(cls):
 
     cls._api._assemble_groups(cls)
 
+    api_server.all_models[cls._api.api_name] = cls
+
     cls.api_serialize = _api_serialize_impl
     cls.api_deserialize = _api_deserialize_impl
 
     api_autogenerator.include_model(cls)
+
 
     return cls
 

@@ -59,6 +59,7 @@ SILENCED_SYSTEM_CHECKS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'api_lib.apps.ApiLibConfig',
     'viewmodule.apps.ViewmoduleConfig',
     'profiles.apps.ProfilesConfig',
     'submissions.apps.SubmissionsConfig',

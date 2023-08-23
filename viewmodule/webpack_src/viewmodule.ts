@@ -191,15 +191,8 @@ export class ViewmoduleManager {
      */
     register(subpath: string, viewmodule: Viewmodule): void {
         // Check for subpath validity
-        if (!subpath.startsWith('/')) {
-            throw new Error(`Subpath '${subpath}' is invalid: `
-                            + "does not start with '/'");
-        }
-        for (const badChar of ['#', '?', '@']) {
-            if (subpath.includes(badChar)) {
-                throw new Error(`Subpath '${subpath}' is invalid: `
-                                + `contains '${badChar}'`);
-            }
+        if (!/^\/[0-9a-zA-Z_/]*$/.test(subpath)) {
+            throw new Error(`Subpath '${subpath}' is invalid`)
         }
 
         // Check for duplicates
@@ -234,17 +227,6 @@ export class ViewmoduleManager {
             .then((wishes) => {
                 document.title = wishes.title;
             });
-        if (!newRoot.hasChildNodes()) {
-            this.installLoading();
-        }
-    }
-
-    private installLoading(): void {
-        this.root.innerHTML = `
-            <div>
-                Loading <code>${this.installedSubpath}</code>...
-            </div>
-        `;
     }
 
 

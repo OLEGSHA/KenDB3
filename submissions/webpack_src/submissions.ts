@@ -7,6 +7,11 @@ class HelloWorldModule implements Viewmodule {
         const me = subpath.substring('/hello_'.length);
 
         if (me === 'lag') {
+            root.innerHTML = `
+                <div>
+                    Loading <code>${subpath}</code>...
+                </div>
+            `;
             await new Promise(res => setTimeout(res, 2000));
         }
 

@@ -1,5 +1,5 @@
 import { Viewmodule, ViewmoduleManager } from 'viewmodule';
-import { Submission } from 'api_lib';
+import { Submission } from 'dataman';
 
 class HelloWorldModule implements Viewmodule {
 

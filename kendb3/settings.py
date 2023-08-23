@@ -59,10 +59,10 @@ SILENCED_SYSTEM_CHECKS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'javascript_pipeline.apps.JavascriptPipelineConfig',
     'viewmodule.apps.ViewmoduleConfig',
     'profiles.apps.ProfilesConfig',
     'submissions.apps.SubmissionsConfig',
+    'javascript_pipeline.apps.JavascriptPipelineConfig',
     'taggit',
     'django.contrib.admin',
     'django.contrib.auth',

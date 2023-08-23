@@ -7,6 +7,9 @@ model.
 This subsystem currently only handles (de-)serialization to basic Python obj-
 ects - acceptable for DjangoJSONEncoder. It will probably be expanded later.
 
+TypeScript class declarations are automatically generated for all API models,
+accessible via `import { MyModel } from 'dataman';` in frontend code.
+
 # Usage
 
 From the system's viewpoint, model instances are collections of fields that can
@@ -115,9 +118,11 @@ from django.db import models
 
 from taggit.managers import _TaggableManager
 
+from . import api_autogenerator
+
 
 def api_model(cls):
-    """Create API methods and classmethods in cls.
+    """Create API methods and classmethods in cls and schedule autogeneration.
 
     This decorator expects to find an APIEngine instance in cls._api, which
     should have been used to mark API fields. See module docstring for details.
@@ -127,6 +132,8 @@ def api_model(cls):
 
     cls.api_serialize = _api_serialize_impl
     cls.api_deserialize = _api_deserialize_impl
+
+    api_autogenerator.include_model(cls)
 
     return cls
 
@@ -306,6 +313,8 @@ class APIEngine:
 
         self.field_groups = field_groups
         self.api_name = re.sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower();
+        self.all_fields = { meta.name for group in self.field_groups.values()
+                                      for meta in group }
 
     def _get_fields(self, group):
         result = self.field_groups.get(group, None)

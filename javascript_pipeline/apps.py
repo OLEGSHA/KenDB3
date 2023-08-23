@@ -6,6 +6,8 @@ import sys
 from django.apps import AppConfig
 from django.conf import settings
 
+from . import autogenerators
+
 
 _NPM_EXECUTABLE = os.environ.get('NPM_EXECUTABLE', 'npm')
 BUILD_PRODUCTION = [_NPM_EXECUTABLE, 'run', 'build']
@@ -17,35 +19,51 @@ class JavascriptPipelineConfig(AppConfig):
     name = 'javascript_pipeline'
 
     def ready(self):
-        """Run frontend pipeline if necessary.
+        """Run frontend pipeline, including autogenerators, if necessary.
 
         Environment variables:
 
         JAVASCRIPT_PIPELINE__SHOULD_RUN
           Set by wsgi.py and asgi.py. Set manually to encourage building front-
-          end. Overridden by PREVENT_RUNS.
+          end. Overridden by either of PREVENT_RUNS and IS_RELOAD.
 
         JAVASCRIPT_PIPELINE__PREVENT_RUNS
-          Set by this method to prevent duplicate runs due to live reloads. Set
-          manually to prevent frontend builds. Overrides SHOULD_RUN.
+          Set manually to prevent frontend builds. Overrides SHOULD_RUN.
+
+        JAVASCRIPT_PIPELINE__IS_RELOAD
+          Set by this method to prevent duplicate runs due to live reloads.
+          Do not set manually. Overrides SHOULD_RUN.
         """
 
-        # Determine if running is necessary
-        def check(x):
-            return os.environ.get(f"JAVASCRIPT_PIPELINE__{x}", '')
-        should_run = (not check('PREVENT_RUNS')
-                      and (check('SHOULD_RUN') or ('runserver' in sys.argv)))
-        if not should_run:
-            return
+        try:
+            def check(x):
+                return os.environ.get(f"JAVASCRIPT_PIPELINE__{x}", '')
 
-        # Run appropriate command
-        if settings.DEBUG:
-            start_development_daemon()
-        else:
-            build_pipeline()
+            if check('PREVENT_RUNS'):
+                # Disabled by user
+                return
 
-        # Prevent re-runs
-        os.environ['JAVASCRIPT_PIPELINE__PREVENT_RUNS'] = 'true'
+            if not check('SHOULD_RUN') and ('runserver' not in sys.argv):
+                # Not a real server start
+                return
+
+            is_first_load = not check('IS_RELOAD')
+
+            # Run autogenerators
+            autogenerators.run()
+
+            # Run script
+            if is_first_load:
+                if settings.DEBUG:
+                    start_development_daemon()
+                else:
+                    build_pipeline()
+
+            # Prevent re-runs
+            os.environ['JAVASCRIPT_PIPELINE__IS_RELOAD'] = 'true'
+
+        finally:
+            autogenerators.cancel_registrations()
 
 
 def start_development_daemon():

@@ -43,15 +43,18 @@ def get_models(ids, group, model_class):
     }
 
 
-def make_injection(*entries):
-    """Create an injectable dict based on provided queries.
+def inject(context, entries):
+    """Modify context to make an injection of entries.
 
-    Each argument must be one of:
+    Each the entry iterable must be one of:
         (instances, fields)
         instances
     where:
         instances - an iterable of instances of one model (including QuerySet),
         fields - the field group to serialize, defaults to '*'
+
+    This function can be used multiple times on the same context.
+    The context object is modified in-place and returned.
     """
     def normalize(e):
         if isinstance(e, tuple) and len(e) == 2 and isinstance(e[1], str):
@@ -72,7 +75,12 @@ def make_injection(*entries):
     ]
     last_modification = last_modification_timestamp().isoformat()
 
-    return [
+    target = context.get('injected_packets', None)
+    if target is None:
+        target = []
+        context['injected_packets'] = target
+
+    target += [
         {
             'model': model.__name__,
             'fields': group,
@@ -85,6 +93,8 @@ def make_injection(*entries):
         }
         for instances, model, group in normalized_entries
     ]
+
+    return context
 
 
 @require_safe

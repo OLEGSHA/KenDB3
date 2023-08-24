@@ -12,11 +12,10 @@ def page(request, subpath=''):
     revisions = (SubmissionRevision.objects
         .filter(pk__in={sub.latest_revision for sub in submissions}))
 
-    context = {
-        'injected_packets': api_server.make_injection(
-            submissions,
-            MinecraftVersion.objects.all(),
-            (revisions, 'basic'),
-        )
-    }
+    context = {}
+    api_server.inject(context, [
+        MinecraftVersion.objects.all(),
+        submissions,
+        (revisions, 'basic'),
+    ])
     return render(request, "submissions/index.html", context=context)

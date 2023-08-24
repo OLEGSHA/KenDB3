@@ -49,3 +49,8 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"@{self.user.username} ({self.display_name})"
+
+    last_modified = models.DateTimeField(
+        help_text=('Last modification timestamp.'),
+        auto_now=True,
+    )

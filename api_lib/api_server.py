@@ -2,6 +2,8 @@ from django.db.models.query import QuerySet
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_safe
 
+from .last_modified_manager import last_modification_timestamp
+
 
 all_models = {}
 
@@ -37,6 +39,7 @@ def get_models(ids, group, model_class):
             instance.api_serialize(group)
             for instance in model_class.objects.filter(**query)
         ],
+        'last_modified': last_modification_timestamp().isoformat(),
     }
 
 
@@ -67,6 +70,7 @@ def make_injection(*entries):
     normalized_entries = [
         normalized for e in entries if (normalized := normalize(e))
     ]
+    last_modification = last_modification_timestamp().isoformat()
 
     return [
         {
@@ -75,7 +79,8 @@ def make_injection(*entries):
             'packet': {
                 'instances': [
                     instance.api_serialize(group) for instance in instances
-                ]
+                ],
+                'last_modified': last_modification,
             }
         }
         for instances, model, group in normalized_entries

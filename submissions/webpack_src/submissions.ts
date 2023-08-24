@@ -1,5 +1,6 @@
+import { formatTimestamp } from 'common';
 import { Viewmodule, ViewmoduleManager } from 'viewmodule';
-import { Submission, SubmissionRevision } from 'dataman';
+import { Submission, SubmissionRevision, lastModified } from 'dataman';
 
 class HelloWorldModule implements Viewmodule {
 
@@ -40,6 +41,7 @@ class HelloWorldModule implements Viewmodule {
                          alt="Kitten photo"
                          title="Go to spam">
             </ul>
+            <p>Last modification: ${formatTimestamp(lastModified())}
         `;
 
         return {

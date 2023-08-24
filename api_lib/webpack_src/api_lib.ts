@@ -1,4 +1,4 @@
-import { debug } from 'common'
+import { debug, error } from 'common'
 
 /**
  * Manages model instances of one type.
@@ -406,6 +406,14 @@ export class ModelManager<Model extends ModelBase> {
     private doAddData(data: Packet, fields: string): Set<number> {
         const seenIds = new Set<number>();
 
+        // Ensure data consistency
+        const dataTimestamp = new Date(data.last_modified);
+        if (_lastModified === null) {
+            _lastModified = dataTimestamp;
+        } else if (_lastModified.getTime() != dataTimestamp.getTime()) {
+            this.handleObsoletion();
+        }
+
         for (const instanceData of data.instances) {
             const id = instanceData.id;
 
@@ -427,6 +435,14 @@ export class ModelManager<Model extends ModelBase> {
               + `fields ${fields} IDs`, Array.from(seenIds));
 
         return seenIds;
+    }
+
+    /**
+     * Called when server data last-modified timestamp changes.
+     */
+    private handleObsoletion(): void {
+        // Panic!
+        window.location.reload();
     }
 
     /**
@@ -453,6 +469,22 @@ export class ModelManager<Model extends ModelBase> {
 }
 
 /**
+ * Timestamp of last modification of data on server, or null if no packets
+ * have been processed yet.
+ */
+var _lastModified: Date | null = null;
+
+/**
+ * Timestamp of last modification of data on server.
+ *
+ * @returns the timestamp
+ * @throws {Error} if no packets have been processed yet
+ */
+export function lastModified(): Date {
+    return _lastModified ?? error('No data available');
+}
+
+/**
  * Create a ModelManager and store it in modelClass.objects.
  *
  * @param modelClass model class
@@ -470,6 +502,7 @@ export type Packet = {
     instances: {
         id: number
     }[],
+    last_modified: string,
 };
 
 export enum Status {

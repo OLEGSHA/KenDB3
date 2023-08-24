@@ -111,6 +111,11 @@ class Submission(models.Model):
         rev = self.get_latest_revision(raise_if_none=False)
         return rev.id if rev else None
 
+    last_modified = models.DateTimeField(
+        help_text=('Last modification timestamp.'),
+        auto_now=True,
+    )
+
     def __str__(self):
         latest = self.get_latest_revision(raise_if_none=False)
         if latest:
@@ -259,6 +264,11 @@ class SubmissionRevision(models.Model):
         help_text=("Database editors' comments on the submission. "
                    'Unsanitized HTML-disabled Markdown.'),
         blank=True,
+    )
+
+    last_modified = models.DateTimeField(
+        help_text=('Last modification timestamp.'),
+        auto_now=True,
     )
 
     def __str__(self):

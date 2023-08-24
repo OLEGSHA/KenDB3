@@ -88,3 +88,22 @@ export function getInjection<T>(id: string, cache: boolean = true): T {
 
     return value as T;
 }
+
+/*
+ * Formats given Date object, e.g. 2023-02-28 11:39. Local timezone is used.
+ */
+export function formatTimestamp(ts: Date): string {
+    const pad = function(obj: any, minLength: number): string {
+        let str = '' + obj;
+        while (str.length < minLength) {
+            str = '0' + str;
+        }
+        return str;
+    };
+
+    return pad(ts.getFullYear(), 4) + '-' +
+           pad(ts.getMonth() + 1, 2) + '-' +
+           pad(ts.getDate(), 2) + ' ' +
+           pad(ts.getHours(), 2) + ':' +
+           pad(ts.getMinutes(), 2);
+}

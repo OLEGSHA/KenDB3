@@ -40,40 +40,30 @@ def get_models(ids, group, model_class):
             for instance in model_class.objects.filter(**query)
         ],
         'last_modified': last_modification_timestamp().isoformat(),
+        'dump': ids is None,
     }
 
 
-def inject(context, entries):
-    """Modify context to make an injection of entries.
+def inject(context, instances, group='*', *, dump=False):
+    """Modify context to make an injection of instances.
 
-    Each the entry iterable must be one of:
-        (instances, fields)
-        instances
-    where:
-        instances - an iterable of instances of one model (including QuerySet),
-        fields - the field group to serialize, defaults to '*'
+    instances can be any iterable. If instances is empty or only contains None
+    elements, this function does nothing. instances elements that are None are
+    ignored.
 
-    Empty instances iterables and None instances elements are silently ignored.
+    All non-None instances must be of the same type.
+
+    To inject a single instance, wrap it in an array or a tuple.
+
     This function can be used multiple times on the same context.
     The context object is modified in-place and returned.
     """
-    def normalize(e):
-        if isinstance(e, tuple) and len(e) == 2 and isinstance(e[1], str):
-            instances = e[0]
-            group = e[1]
-        else:
-            instances = e
-            group = '*'
+    instances_list = list(i for i in instances if i is not None)
+    if not instances_list:
+        return None
+    assert len({ type(i) for i in instances_list }) == 1  # Forbid type mixing
 
-        instances = list(instances)
-        if not instances:
-            return None
-        assert len({ type(i) for i in instances }) == 1  # Forbid type mixing
-        return (instances, type(instances[0]), group)
-
-    normalized_entries = [
-        normalized for e in entries if (normalized := normalize(e))
-    ]
+    model = type(instances_list[0])
     last_modification = last_modification_timestamp().isoformat()
 
     target = context.get('injected_packets', None)
@@ -81,20 +71,18 @@ def inject(context, entries):
         target = []
         context['injected_packets'] = target
 
-    target += [
-        {
-            'model': model.__name__,
-            'fields': group,
-            'packet': {
-                'instances': [
-                    instance.api_serialize(group)
-                    for instance in instances if instance is not None
-                ],
-                'last_modified': last_modification,
-            }
+    target.append({
+        'model': model.__name__,
+        'fields': group,
+        'packet': {
+            'instances': [
+                instance.api_serialize(group)
+                for instance in instances_list
+            ],
+            'last_modified': last_modification,
+            'dump': dump,
         }
-        for instances, model, group in normalized_entries
-    ]
+    })
 
     return context
 

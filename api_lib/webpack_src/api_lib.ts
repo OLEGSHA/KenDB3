@@ -371,8 +371,6 @@ export class ModelManager<Model extends ModelBase> {
         const seenIds = this.doAddData(data.payload as Packet, fields);
 
         if (pendingIds !== null) {
-            // Selective request
-
             // Remove pending status for remaining instances
             const pendingIdsCopy = new Set<number>(pendingIds);
             for (const id of seenIds) {
@@ -384,9 +382,6 @@ export class ModelManager<Model extends ModelBase> {
                 this.getOrCreate(id).setStatus(fields, Status.NotRequested);
             }
 
-        } else {
-            // Dump request
-            this.setStatusOfDump(fields, Status.Available);
         }
 
         // Raise event
@@ -429,6 +424,10 @@ export class ModelManager<Model extends ModelBase> {
             // Update status and mark as completed
             instance.setStatus(fields, Status.Available);
             seenIds.add(id);
+        }
+
+        if (data.dump) {
+            this.setStatusOfDump(fields, Status.Available);
         }
 
         debug(`Dataman: doAddData ${this.modelClass.name} `
@@ -503,6 +502,7 @@ export type Packet = {
         id: number
     }[],
     last_modified: string,
+    dump: boolean,
 };
 
 export enum Status {

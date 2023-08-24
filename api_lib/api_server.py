@@ -53,6 +53,7 @@ def inject(context, entries):
         instances - an iterable of instances of one model (including QuerySet),
         fields - the field group to serialize, defaults to '*'
 
+    Empty instances iterables and None instances elements are silently ignored.
     This function can be used multiple times on the same context.
     The context object is modified in-place and returned.
     """
@@ -86,7 +87,8 @@ def inject(context, entries):
             'fields': group,
             'packet': {
                 'instances': [
-                    instance.api_serialize(group) for instance in instances
+                    instance.api_serialize(group)
+                    for instance in instances if instance is not None
                 ],
                 'last_modified': last_modification,
             }

@@ -2,53 +2,72 @@ import { formatTimestamp } from 'common';
 import { Viewmodule, ViewmoduleManager } from 'viewmodule';
 import { Submission, SubmissionRevision, lastModified } from 'dataman';
 
-class HelloWorldModule implements Viewmodule {
-
+class IndexViewmodule implements Viewmodule {
     async install(root: HTMLElement, subpath: string) {
-        const me = subpath.substring('/hello_'.length);
+        const subs = await Submission.objects.getAll();
+        const revs = await SubmissionRevision.objects.getBulk(
+            subs.map((s) => s.latest_revision).filter((r) => r !== null),
+            'basic'
+        );
 
-        if (me === 'lag') {
-            root.innerHTML = `
-                <div>
-                    Loading <code>${subpath}</code>...
-                </div>
-            `;
-            await new Promise(res => setTimeout(res, 2000));
+        const preamble = document.createElement('p');
+        preamble.textContent = (
+            `Total ${revs.length} submissions. `
+            + 'Last update: ' + formatTimestamp(lastModified()));
+
+        const list = document.createElement('ul');
+        revs.sort((a, b) => a.id - b.id);
+        for (const rev of revs) {
+            list.insertAdjacentHTML(
+                'beforeend',
+                `<li>
+                    Submission ${rev.revision_of_id}: ${rev.name ?? 'Untitled'}
+                    v${rev.revision_string}
+                    <button type="button" data-href="${rev.revision_of_id}">
+                        Details
+                    </button>
+                </li>`
+            );
+            console.warn('I just inserted unsafe strings into HTML!');
         }
 
-        const sub = await Submission.objects.get(49);
-        const rev = await (SubmissionRevision.objects
-            .get(sub.latest_revision, 'basic'));
-
-        root.innerHTML = `
-            <h1>I am ${me}</h1>
-            <p>Revisions of Submission ${sub.id}: ${rev.name ?? 'Untitled'}
-            <ul>
-                <li><a href="hello_spam">Spam</a>
-                <li><a href="hello_lag">Lag</a>
-                <li><button type="button" data-href="hello_ham">Ham</button>
-                <li><a href="hello_eggs">
-                        not
-                        <span style="color: green;">green</span>
-                        Eggs
-                    </a>
-                <li><a href="https://windcorp.ru/">Get me out of here!</a>
-                <li><a href="hello_foobar">
-                        Hoo boy this is gonna be a wild one
-                    </a>
-                <li><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juvenile_Ragdoll.jpg/667px-Juvenile_Ragdoll.jpg"
-                         onclick="window.viewmoduleManager.go('hello_spam')"
-                         alt="Kitten photo"
-                         title="Go to spam">
-            </ul>
-            <p>Last modification: ${formatTimestamp(lastModified())}
-        `;
+        root.append(preamble, list);
 
         return {
-            title: me.toUpperCase().split('').join('-'),
-        }
+            title: 'Submissions'
+        };
     }
+}
 
+class DetailsViewmodule implements Viewmodule {
+    async install(root: HTMLElement, subpath: string) {
+        const id = Number(subpath.substring('/'.length));
+        const sub = await Submission.objects.get(id);
+        const rev = await SubmissionRevision.objects.get(
+            sub.latest_revision, '*');
+
+        Submission.objects.getAll().then(
+            (subs) => SubmissionRevision.objects.getBulk(
+                subs.map((s) => s.latest_revision).filter((r) => r !== null),
+                'basic'
+            )
+        );
+
+        root.insertAdjacentHTML(
+            'beforeend',
+            `<h1>${id} / ${rev.name ?? 'Untitled'}</h1>
+            <p>Version: v${rev.revision_string}
+            <p>Rules JSON: ${rev.rules}
+            <p>Author notes: ${rev.author_notes}
+            <p>Editors' comment: ${rev.editors_comment}
+            `
+        );
+        console.warn('I just inserted unsafe strings into HTML!');
+
+        return {
+            title: `Submission ${id}`
+        };
+    }
 }
 
 declare global {
@@ -59,13 +78,12 @@ declare global {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const helloWorld = new HelloWorldModule();
+    const index = new IndexViewmodule();
+    const details = new DetailsViewmodule();
 
     window.viewmoduleManager = new ViewmoduleManager(new Map([
-        ['/hello_spam', helloWorld],
-        ['/hello_lag', helloWorld],
-        ['/hello_eggs', helloWorld],
-        ['/hello_ham', helloWorld],
+        ['/', index],
+        ['/49', details],
     ]));
 
 });

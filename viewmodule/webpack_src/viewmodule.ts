@@ -84,8 +84,11 @@ export class ViewmoduleManager {
         let base: string | null = null;
         for (const [subpath, viewmodule] of this.registry) {
             if (path.endsWith(subpath)) {
-                base = path.substring(0, path.length - subpath.length);
-                break;
+                const b = path.substring(0, path.length - subpath.length);
+                // Select shortest base
+                if (base === null || base.length > b.length) {
+                    base = b;
+                }
             }
         }
         if (base == null) {

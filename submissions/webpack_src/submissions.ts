@@ -1,5 +1,5 @@
 import { formatTimestamp } from 'common';
-import { Viewmodule, ViewmoduleManager } from 'viewmodule';
+import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
 import { Submission, SubmissionRevision, lastModified } from 'dataman';
 
 class IndexViewmodule implements Viewmodule {
@@ -81,9 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const index = new IndexViewmodule();
     const details = new DetailsViewmodule();
 
-    window.viewmoduleManager = new ViewmoduleManager(new Map([
-        ['/', index],
-        ['/49', details],
-    ]));
+    const subpaths = new Subpaths();
+    subpaths.register('/', index);
+
+    Submission.objects.doOnceForEach(
+        (sub) => subpaths.register('/' + sub.id, details)
+    );
+
+    window.viewmoduleManager = new ViewmoduleManager(subpaths);
 
 });

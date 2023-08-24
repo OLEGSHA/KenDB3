@@ -41,6 +41,48 @@ export interface Viewmodule {
 }
 
 /**
+ * A registry of subpath-to-viewmodule pairs.
+ */
+export class Subpaths {
+
+    /**
+     * Backing container.
+     */
+    private readonly map = new Map<string, Viewmodule>();
+
+    /**
+     * Register a new viewmodule for given subpath.
+     *
+     * @param subpath the subpath to assign the viewmodule to
+     * @param viewmodule the viewmodule to register
+     *
+     * @throws {Error} if subpath is invalid or if it is already registered.
+     */
+    register(subpath: string, viewmodule: Viewmodule): void {
+        // Check for subpath validity
+        if (!/^\/[0-9a-zA-Z_/]*$/.test(subpath)) {
+            throw new Error(`Subpath '${subpath}' is invalid`)
+        }
+
+        // Check for duplicates
+        if (this.map.has(subpath)) {
+            throw new Error(`Subpath '${subpath}' is already registered`);
+        }
+
+        debug('ViewmoduleManager: registered', viewmodule, 'at', subpath);
+        this.map.set(subpath, viewmodule);
+    }
+
+    get size(): number {
+        return this.map.size;
+    }
+
+    [Symbol.iterator] = this.map[Symbol.iterator].bind(this.map);
+    get = this.map.get.bind(this.map)
+
+}
+
+/**
  * Viewmodule manager class.
  */
 export class ViewmoduleManager {
@@ -58,23 +100,19 @@ export class ViewmoduleManager {
     /**
      * Mapping from subpaths to viewmodules.
      */
-    private registry = new Map<string, Viewmodule>();
+    private readonly registry: Subpaths;
 
     /**
      * Initialize viewmodules and install viewmodule based on current location.
      *
-     * @param moduleMap a viewmodule mapping with
-     *        subpaths (specified as '/apple') as keys. A viewmodule can be
-     *        mapped to multiple subpaths.
+     * @param subpaths subpath mapping to use. A reference to this object is
+     *        stored, so updates to subpaths are automatically visible.
      *
-     * @throws {Error} if moduleMap is empty, any subpath is malformed, or if
-     *         current location does not correspond to any path.
+     * @throws {Error} if subpaths is empty, or if current location does not
+     *         correspond to any path.
      */
-    constructor(moduleMap: Map<string, Viewmodule>) {
-        // Register all subpaths
-        for (const [subpath, viewmodule] of moduleMap) {
-            this.register(subpath, viewmodule);
-        }
+    constructor(subpaths: Subpaths) {
+        this.registry = subpaths;
         if (this.registry.size == 0) {
             throw new Error('No subpaths provided');
         }
@@ -104,8 +142,7 @@ export class ViewmoduleManager {
             this.handlePopStateEvent.bind(this));
 
         debug('ViewmoduleManager initialized with base', this.base,
-              ', root ', this.root,
-              'and registered modules', this.registry);
+              'and root', this.root);
 
         // Initialize root
         this.install();
@@ -181,28 +218,6 @@ export class ViewmoduleManager {
      */
     get installedSubpath(): string | null {
         return this._installedSubpath;
-    }
-
-    /**
-     * Register a new viewmodule for given subpath.
-     *
-     * @param subpath the subpath to assign the viewmodule to
-     * @param viewmodule the viewmodule to register
-     *
-     * @throws {Error} if subpath is invalid or if it is already registered.
-     */
-    register(subpath: string, viewmodule: Viewmodule): void {
-        // Check for subpath validity
-        if (!/^\/[0-9a-zA-Z_/]*$/.test(subpath)) {
-            throw new Error(`Subpath '${subpath}' is invalid`)
-        }
-
-        // Check for duplicates
-        if (this.registry.has(subpath)) {
-            throw new Error(`Subpath '${subpath}' is already registered`);
-        }
-
-        this.registry.set(subpath, viewmodule);
     }
 
     /**

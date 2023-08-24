@@ -35,6 +35,7 @@ class _TypeScriptTemplates:  # namespace
 
         import {{
             ModelBase,
+            ModelClass,
             ModelManager,
             manageModel,
             Status,
@@ -50,7 +51,7 @@ class _TypeScriptTemplates:  # namespace
          * @param modelAPIName model name to use in download URL
          */
         function autogenManagerModel<Model extends ModelBase>(
-            modelClass: new(id: number) => Model,
+            modelClass: ModelClass<Model>,
             modelAPIName: string,
         ): void {{
             const template = getInjection<string>('dataman-endpoint');
@@ -68,6 +69,11 @@ class _TypeScriptTemplates:  # namespace
              * This model's ModelManager.
              */
             static objects: ModelManager<{model}>;
+
+            /**
+             * Field groups available for this model.
+             */
+            static fields = {model_groups};
 
     ''')
 
@@ -114,6 +120,11 @@ class _APIAutogenerator():
         templ = _TypeScriptTemplates
         ctxt = {**ctxt,
             'model': model.__name__,
+            'model_groups': (
+                '[' + ', '.join(
+                    repr(r) for r in model._api.field_groups.keys()
+                ) + ']'
+            ),
             'model_api_name': model._api.api_name,
             'model_docs': _make_jsdoc(cleandoc(model.__doc__)),
         }

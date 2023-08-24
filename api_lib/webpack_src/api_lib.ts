@@ -43,7 +43,7 @@ export class ModelManager<Model extends ModelBase> {
     /**
      * Model constructor.
      */
-    private modelClass: new(id: number) => Model;
+    private modelClass: ModelClass<Model>;
 
     /**
      * Create a ModelManager.
@@ -52,7 +52,7 @@ export class ModelManager<Model extends ModelBase> {
      * @param requestUrl download URL without `ids` or `fields`.
      */
     constructor(
-        modelClass: new(id: number) => Model,
+        modelClass: ModelClass<Model>,
         requestUrl: URL | string
     ) {
         this.requestUrl = new URL(requestUrl);
@@ -368,12 +368,13 @@ export class ModelManager<Model extends ModelBase> {
         const data = await response.json();
 
         // Fill in data and update status of received instances
-        const seenIds = this.doAddData(data.payload as Packet, fields);
+        const seen = this.doAddData(data.payload as Packet, fields);
 
         if (pendingIds !== null) {
             // Remove pending status for remaining instances
             const pendingIdsCopy = new Set<number>(pendingIds);
-            for (const id of seenIds) {
+            for (const instance of seen) {
+                const id = instance.id;
                 if (pendingIdsCopy.has(id)) {
                     pendingIdsCopy.delete(id);
                 }
@@ -381,11 +382,10 @@ export class ModelManager<Model extends ModelBase> {
             for (const id of pendingIdsCopy) {
                 this.getOrCreate(id).setStatus(fields, Status.NotRequested);
             }
-
         }
 
         // Raise event
-        this.eventBus.dispatchEvent(new Event('update'));
+        this.fireUpdateEvent(seen, fields);
     }
 
     /**
@@ -396,10 +396,10 @@ export class ModelManager<Model extends ModelBase> {
      * @param data an instance array
      * @param fields the fields provided
      *
-     * @returns the set of all IDs encountered
+     * @returns the set of all instances encountered
      */
-    private doAddData(data: Packet, fields: string): Set<number> {
-        const seenIds = new Set<number>();
+    private doAddData(data: Packet, fields: string): Set<Model> {
+        const seenInstances = new Set<Model>();
 
         // Ensure data consistency
         const dataTimestamp = new Date(data.last_modified);
@@ -423,7 +423,7 @@ export class ModelManager<Model extends ModelBase> {
 
             // Update status and mark as completed
             instance.setStatus(fields, Status.Available);
-            seenIds.add(id);
+            seenInstances.add(instance);
         }
 
         if (data.dump) {
@@ -431,10 +431,87 @@ export class ModelManager<Model extends ModelBase> {
         }
 
         debug(`Dataman: doAddData ${this.modelClass.name} `
-              + `fields ${fields} IDs`, Array.from(seenIds));
+              + `fields ${fields} IDs`,
+              Array.from(seenInstances).map((i) => i.id));
 
-        return seenIds;
+        return seenInstances;
     }
+
+    /**
+     * Fire an update event.
+     *
+     * @param updatedInstances instances to report as updated
+     * @param fields the field group that was updated
+     */
+    private fireUpdateEvent(
+        updatedInstances: Iterable<Model>,
+        fields: string
+    ): void {
+        const detail = {
+            'updated': Array.from(updatedInstances),
+            'fields': fields,
+        }
+        const event = new CustomEvent('update', {'detail': detail})
+        this.eventBus.dispatchEvent(event);
+    }
+
+    /**
+     * Call action once for every instance that has at least one Available
+     * field group.
+     *
+     * action is applied retroactively to all existing instances when the call
+     * is made.
+     *
+     * @param action the action to run
+     */
+    doOnceForEach(action: (inst: Model) => void): void {
+        const visited = new Set<number>();
+
+        /**
+         * Checks if instance has available fields and is new then calls action
+         */
+        const wrappedAction = (instance: Model) => {
+            if (!this.modelClass.fields.some(
+                (f) => instance.statusOf(f) === Status.Available
+            )) {
+                return;
+            }
+
+            if (visited.has(instance.id)) {
+                return;
+            }
+
+            visited.add(instance.id);
+            action(instance);
+        }
+
+        this.store.forEach(wrappedAction);
+
+        this.addEventListener('update', (e) => {
+            const updated = (e as CustomEvent<{
+                updated: Model[],
+                fields: string,
+            }>).detail.updated;
+            updated.forEach(wrappedAction);
+        });
+    }
+
+    /**
+     * Add an event listener. See EventTarget.addEventListener.
+     *
+     * Available events:
+     *   - update: CustomEvent<{updated: Model[], fields: string}>
+     *     Fired when any instances change. updated includes all inst-
+     *     ances that have changed.
+     */
+    addEventListener = (
+        this.eventBus.addEventListener.bind(this.eventBus));
+
+    /**
+     * Add an event listener. See EventTarget.removeEventListener.
+     */
+    removeEventListener = (
+        this.eventBus.removeEventListener.bind(this.eventBus));
 
     /**
      * Called when server data last-modified timestamp changes.
@@ -451,8 +528,8 @@ export class ModelManager<Model extends ModelBase> {
      * @param fields the fields provided
      */
     addData(data: Packet, fields: string): void {
-        const added = this.doAddData(data, fields);
-        this.eventBus.dispatchEvent(new Event('update'));
+        const seen = this.doAddData(data, fields);
+        this.fireUpdateEvent(seen, fields);
     }
 
     /**
@@ -490,11 +567,10 @@ export function lastModified(): Date {
  * @param requestUrl download URL without the `ids` search parameter
  */
 export function manageModel<Model extends ModelBase>(
-    modelClass: new(id: number) => Model,
+    modelClass: ModelClass<Model>,
     requestUrl: URL | string,
 ): void {
-    (modelClass as any).objects
-        = new ModelManager<Model>(modelClass, requestUrl);
+    modelClass.objects = new ModelManager<Model>(modelClass, requestUrl);
 }
 
 export type Packet = {
@@ -516,7 +592,6 @@ export class ModelBase {
 
     constructor(id: number) {
         this.id = id;
-        debug(`Dataman: created ${this.constructor.name} ID ${id}`);
     }
 
     statusOf(fields: string): Status {
@@ -525,6 +600,11 @@ export class ModelBase {
 
     setStatus(fields: string, status: Status) {
         (this as any)['_fields_' + fields] = status;
-        debug(`Dataman: ${this.constructor.name} ID ${this.id}: '${fields}' is now ${Status[status]}`);
     }
+}
+
+export interface ModelClass<Model extends ModelBase> {
+    new (id: number): Model;
+    objects: ModelManager<Model>;
+    fields: string[];
 }

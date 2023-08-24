@@ -35,7 +35,7 @@ class MinecraftVersion(models.Model):
     )
 
     display_name: _api() = models.CharField(
-        help_text=('Displayed user-friendly name like <code>JE 1.19.4</code>.'
+        help_text=('Displayed user-friendly name like <code>JE 1.19.4</code>. '
                    'Plain text, HTML will be escaped.'),
         max_length=32,
         blank=False,
@@ -104,6 +104,12 @@ class Submission(models.Model):
             raise ValueError('No revisions found for submission '
                              f"#{self.submission_id}")
         return rev_or_none
+
+    @_api().property
+    def latest_revision(self):
+        """ID of the lastest revision of this submission or None."""
+        rev = self.get_latest_revision(raise_if_none=False)
+        return rev.id if rev else None
 
     def __str__(self):
         latest = self.get_latest_revision(raise_if_none=False)
@@ -244,13 +250,13 @@ class SubmissionRevision(models.Model):
     )
 
     changelog: _api() = models.TextField(
-        help_text=('Summary of changes in this revision.'
+        help_text=('Summary of changes in this revision. '
                    'Unsanitized HTML-disabled Markdown.'),
         blank=True,
     )
 
     editors_comment: _api() = models.TextField(
-        help_text=("Database editors' comments on the submission."
+        help_text=("Database editors' comments on the submission. "
                    'Unsanitized HTML-disabled Markdown.'),
         blank=True,
     )

@@ -9,11 +9,14 @@ from .models import Submission, SubmissionRevision, MinecraftVersion
 @require_safe
 def page(request, subpath=''):
     submissions = list(Submission.objects.all())
+    revisions = (SubmissionRevision.objects
+        .filter(pk__in={sub.latest_revision for sub in submissions}))
+
     context = {
         'injected_packets': api_server.make_injection(
             submissions,
             MinecraftVersion.objects.all(),
-            ([SubmissionRevision.objects.all().first()], 'basic'),
+            (revisions, 'basic'),
         )
     }
     return render(request, "submissions/index.html", context=context)

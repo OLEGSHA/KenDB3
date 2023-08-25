@@ -1,7 +1,38 @@
-import { formatTimestamp } from 'common';
-import { Renderer } from 'render';
+import {
+    formatTimestamp,
+    error,
+} from 'common';
+import { Renderer, jsrender } from 'render';
 import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
-import { Submission, SubmissionRevision, lastModified } from 'dataman';
+import {
+    Submission,
+    SubmissionRevision,
+    MinecraftVersion,
+    lastModified,
+} from 'dataman';
+
+declare global {
+    interface Window {
+        viewmoduleManager: ViewmoduleManager | null;
+    }
+}
+
+/*
+ * JsRender converter mcver
+ *
+ * Return version string by ID.
+ *
+ * @param vid ID of the version to fetch
+ * @returns the version string
+ */
+jsrender.views.converters('mcver', (() => {
+    const versions: MinecraftVersion[] = [];
+    MinecraftVersion.objects.doOnceForEach((ver) => versions[ver.id] = ver);
+
+    return (vid: number) => (
+        versions[vid]?.display_name ?? error(`Unknown version ID ${vid}`)
+    );
+})());
 
 class IndexViewmodule implements Viewmodule {
     async install(root: HTMLElement, subpath: string) {
@@ -46,12 +77,6 @@ class DetailsViewmodule implements Viewmodule {
         return {
             title: `Submission ${id}`,
         };
-    }
-}
-
-declare global {
-    interface Window {
-        viewmoduleManager: ViewmoduleManager | null
     }
 }
 

@@ -42,6 +42,12 @@
             <span class="name">{{>name ?? 'Untitled'}}</span>
             <span class="revision-label">Map version</span>
             <span class="revision">{{>revision_string}}</span>
+            <span class="minecraft-versions-label">for</span>
+            <span class="minecraft-version-min">{{mcver:minecraft_version_min_id}}</span>
+            {{if minecraft_version_min_id !== minecraft_version_max_id }}
+                <span class="minecraft-versions-separator">&ndash;</span>
+                <span class="minecraft-version-max">{{mcver:minecraft_version_max_id}}</span>
+            {{/if}}
             <a href="{{:revision_of_id}}">Details</a>
         </li>
     </script>
@@ -60,6 +66,12 @@
             <h2 id="meta-header">Information</h2>
             <span id="revision-label">Map version</span>
             <span id="revision">{{>revision_string}}</span>
+            <span class="minecraft-versions-label">for</span>
+            <span class="minecraft-version-min">{{mcver:minecraft_version_min_id}}</span>
+            {{if minecraft_version_min_id !== minecraft_version_max_id }}
+                <span class="minecraft-versions-separator">&ndash;</span>
+                <span class="minecraft-version-max">{{mcver:minecraft_version_max_id}}</span>
+            {{/if}}
         </div>
         <div id="description">
             <h2 id="rules-label">Rules</h2>

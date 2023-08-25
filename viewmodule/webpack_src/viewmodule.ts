@@ -162,9 +162,6 @@ export class ViewmoduleManager {
                     return null;
                 } else if (element instanceof HTMLAnchorElement) {
                     return element.href;
-                } else if (element instanceof HTMLButtonElement
-                        && 'href' in element.dataset) {
-                    return '' + element.dataset['href'];
                 }
 
                 element = element.parentElement;

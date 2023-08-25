@@ -1,7 +1,4 @@
 // Importing jsrender causes a TS2688 error due to references to jQuery.
-// Using CommonJS require as a temporary measure.
-//import jsrenderImport from 'jsrender';
-//const jsrender = jsrenderImport();
 const jsrender = require('jsrender')();
 
 import { formatTimestamp, getElementByIdOrDie } from 'common';

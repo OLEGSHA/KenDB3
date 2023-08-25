@@ -6,3 +6,73 @@
 {% block main_script_src %}
     <script src="{% static 'bundles/submissions.bundle.js' %}"></script>
 {% endblock %}
+
+{% block jsrender_templates %}{% verbatim %}
+
+    <script id="tmpl-index" type="text/x-jsrender">
+        {{!-- Submissions index toolbar and container --}}
+        <div id="toolbar">
+            <div id="search-and-filter">
+                <div>
+                    <label for="search">Search</label>
+                    <input type="search" id="search" name="search"/>
+                </div>
+            </div>
+            <div id="statistics">
+                <div>
+                    Visible
+                    <span id="visible-count">?</span>
+                    /
+                    <span id="submissions-count">?</span>
+                    entries
+                </div>
+            </div>
+        </div>
+        <ul id="submission-list">
+            <li>Loading...
+        </ul>
+    </script>
+
+    <script id="tmpl-index-entry" type="text/x-jsrender">
+        {{!-- Submissions index loaded entry --}}
+        <li>
+            <span class="id-label">ID</span>
+            <span class="id">{{>revision_of_id}}</span>
+            <span class="name-label">Name</span>
+            <span class="name">{{>name ?? 'Untitled'}}</span>
+            <span class="revision-label">Map version</span>
+            <span class="revision">{{>revision_string}}</span>
+            <button type="button" data-href="{{:revision_of_id}}">
+                Details
+            </button>
+        </li>
+    </script>
+
+    <script id="tmpl-details" type="text/x-jsrender">
+        {{!-- Submission details --}}
+        <nav>
+            <button type="button" data-href="./">
+                All Submissions
+            </button>
+        </nav>
+        <h1>
+            <span id="id">{{>revision_of_id}}</span>
+            /
+            <span id="name">{{>name ?? 'Untitled'}}</span>
+        </h1>
+        <div id="meta">
+            <h2 id="meta-header">Information</h2>
+            <span id="revision-label">Map version</span>
+            <span id="revision">{{>revision_string}}</span>
+        </div>
+        <div id="description">
+            <h2 id="rules-label">Rules</h2>
+            <div id="rules">{{>rules}}</div>
+            <h2 id="author-notes-label">Author Notes</h2>
+            <div id="author-notes">{{>author_notes}}</div>
+            <h2 id="editors-comment-label">Editors' Comment</h2>
+            <div id="editors-comment">{{>editors_comment}}</div>
+        </div>
+    </script>
+
+{% endverbatim %}{% endblock %}

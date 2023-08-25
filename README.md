@@ -60,6 +60,7 @@ Project is not production-ready yet. Migrations will be committed once the code 
   - [NPM](https://npmjs.com) – package management
   - [Webpack](https://webpack.js.org/) – resource bundling
   - [Babel](https://babeljs.io) – resource preprocessing
+  - [JsRender](https://www.jsviews.com/#jsrender) – lightweight clientside HTML renderer
 
 ## License and reuse
 

@@ -4,6 +4,7 @@
     {% url "dataman-endpoint" "MODEL_NAME" as dataman_endpoint %}
     {{ dataman_endpoint|json_script:"dataman-endpoint" }}
     {{ injected_packets|json_script:"injected-packets" }}
+    {% block jsrender_templates %}{% endblock %}
 {% endblock %}
 
 {% block content %}

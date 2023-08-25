@@ -1,40 +1,31 @@
-import { formatTimestamp } from 'common';
+// Importing jsrender causes a TS2688 error due to references to jQuery.
+// Using CommonJS require as a temporary measure.
+//import jsrenderImport from 'jsrender';
+//const jsrender = jsrenderImport();
+const jsrender = require('jsrender')();
+
+import { formatTimestamp, getElementByIdOrDie } from 'common';
 import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
 import { Submission, SubmissionRevision, lastModified } from 'dataman';
 
 class IndexViewmodule implements Viewmodule {
     async install(root: HTMLElement, subpath: string) {
+
+        root.innerHTML = jsrender.templates('#tmpl-index').render();
+
         const subs = await Submission.objects.getAll();
         const revs = await SubmissionRevision.objects.getBulk(
             subs.map((s) => s.latest_revision).filter((r) => r !== null),
             'basic'
         );
 
-        const preamble = document.createElement('p');
-        preamble.textContent = (
-            `Total ${revs.length} submissions. `
-            + 'Last update: ' + formatTimestamp(lastModified()));
-
-        const list = document.createElement('ul');
-        revs.sort((a, b) => a.id - b.id);
-        for (const rev of revs) {
-            list.insertAdjacentHTML(
-                'beforeend',
-                `<li>
-                    Submission ${rev.revision_of_id}: ${rev.name ?? 'Untitled'}
-                    v${rev.revision_string}
-                    <button type="button" data-href="${rev.revision_of_id}">
-                        Details
-                    </button>
-                </li>`
-            );
-            console.warn('I just inserted unsafe strings into HTML!');
-        }
-
-        root.append(preamble, list);
+        // FIXME access bypasses root
+        getElementByIdOrDie('submission-list').innerHTML = (
+            jsrender.templates('#tmpl-index-entry').render(revs)
+        );
 
         return {
-            title: 'Submissions'
+            title: 'Submissions',
         };
     }
 }
@@ -53,19 +44,10 @@ class DetailsViewmodule implements Viewmodule {
             )
         );
 
-        root.insertAdjacentHTML(
-            'beforeend',
-            `<h1>${id} / ${rev.name ?? 'Untitled'}</h1>
-            <p>Version: v${rev.revision_string}
-            <p>Rules JSON: ${rev.rules}
-            <p>Author notes: ${rev.author_notes}
-            <p>Editors' comment: ${rev.editors_comment}
-            `
-        );
-        console.warn('I just inserted unsafe strings into HTML!');
+        root.innerHTML = jsrender.templates('#tmpl-details').render(rev);
 
         return {
-            title: `Submission ${id}`
+            title: `Submission ${id}`,
         };
     }
 }

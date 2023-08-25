@@ -45,6 +45,24 @@ export function getElementByIdOrDie(id: string): HTMLElement {
 }
 
 /**
+ * Get an HTMLElement child of within by its ID or throw an Error.
+ * Works on detached elements.
+ *
+ * @param within the element to look in
+ * @param id the ID to find
+ *
+ * @returns the element
+ * @throws {Error} when element is not found
+ */
+export function getChildById(
+    within: HTMLElement,
+    id: string
+): HTMLElement {
+    return (within.querySelector('#' + id)
+        ?? error(`#${id} not found in ${within}`));
+}
+
+/**
  * Cache of loaded injections by former element ID.
  */
 const loadedInjections = new Map<string, any>();

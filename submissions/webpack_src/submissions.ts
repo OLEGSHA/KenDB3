@@ -1,14 +1,13 @@
-// Importing jsrender causes a TS2688 error due to references to jQuery.
-const jsrender = require('jsrender')();
-
-import { formatTimestamp, getElementByIdOrDie } from 'common';
+import { formatTimestamp } from 'common';
+import { Renderer } from 'render';
 import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
 import { Submission, SubmissionRevision, lastModified } from 'dataman';
 
 class IndexViewmodule implements Viewmodule {
     async install(root: HTMLElement, subpath: string) {
+        const rr = new Renderer(root);
 
-        root.innerHTML = jsrender.templates('#tmpl-index').render();
+        rr.renderSelf('index');
 
         const subs = await Submission.objects.getAll();
         const revs = await SubmissionRevision.objects.getBulk(
@@ -16,10 +15,9 @@ class IndexViewmodule implements Viewmodule {
             'basic'
         );
 
-        // FIXME access bypasses root
-        getElementByIdOrDie('submission-list').innerHTML = (
-            jsrender.templates('#tmpl-index-entry').render(revs)
-        );
+        rr.render('submission-list', 'index-entry', revs);
+        rr.set('visible-count', revs.length);
+        rr.set('submissions-count', revs.length);
 
         return {
             title: 'Submissions',
@@ -29,7 +27,9 @@ class IndexViewmodule implements Viewmodule {
 
 class DetailsViewmodule implements Viewmodule {
     async install(root: HTMLElement, subpath: string) {
+        const rr = new Renderer(root);
         const id = Number(subpath.substring('/'.length));
+
         const sub = await Submission.objects.get(id);
         const rev = await SubmissionRevision.objects.get(
             sub.latest_revision, '*');
@@ -41,7 +41,7 @@ class DetailsViewmodule implements Viewmodule {
             )
         );
 
-        root.innerHTML = jsrender.templates('#tmpl-details').render(rev);
+        rr.renderSelf('details', rev);
 
         return {
             title: `Submission ${id}`,

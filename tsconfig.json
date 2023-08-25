@@ -3,7 +3,8 @@
     "paths": {
       "common": ["./javascript_pipeline/webpack_src/common.ts"],
       "viewmodule": ["./viewmodule/webpack_src/viewmodule.ts"],
-      "dataman": ["./api_lib/webpack_src/dataman.ts"]
+      "dataman": ["./api_lib/webpack_src/dataman.ts"],
+      "render": ["./javascript_pipeline/webpack_src/render.ts"]
     },
     "target": "esnext",
     "moduleResolution": "node",

@@ -598,9 +598,105 @@ export class ModelBase {
         return (this as any)['_fields_' + fields];
     }
 
-    setStatus(fields: string, status: Status) {
+    setStatus(fields: string, status: Status): void {
         (this as any)['_fields_' + fields] = status;
     }
+
+    /**
+     * Get instances referenced by ID in a field and make them available via
+     * a property.
+     *
+     * Source fields are coupled with instance container fields, determined by
+     * source field names, e.g. 'authors_ids' (source) -> 'authors' (container).
+     * This function populates
+     *
+     * @param child the ModelClass of the children
+     * @param source the field in parents that contains the IDs.
+     *        Must be *_id or *_ids.
+     * @param fields the child fields to get.
+     */
+    resolve<ChildModel extends ModelBase>(
+        child: ModelClass<ChildModel>,
+        source: string,
+        fields: string = '*'
+    ): void {
+        resolve([this], child, source, fields);
+    }
+}
+
+/**
+ * Get instances referenced by ID in a field and make them available via
+ * a property.
+ *
+ * Source fields are coupled with instance container fields, determined by
+ * source field names, e.g. 'authors_ids' (source) -> 'authors' (container).
+ * This function populates
+ *
+ * @param parents the instances where IDs can be found
+ * @param child the ModelClass of the children
+ * @param source the field in parents that contains the IDs.
+ *        Must be *_id or *_ids.
+ * @param fields the child fields to get.
+ */
+export async function resolve<
+    ParentModel extends ModelBase,
+    ChildModel extends ModelBase
+>(
+    parents: Iterable<ParentModel>,
+    child: ModelClass<ChildModel>,
+    source: string,
+    fields: string = '*',
+): Promise<void> {
+    let parentArray = Array.from(parents);
+
+    const childIds = new Set<number>();
+    const childMap = new Map<number, ChildModel>();
+
+    const [
+        target, // Name of container field
+        idExtractor,
+        assigner,
+    ] = (() => {
+        if (source.endsWith('_id')) {
+            const target = source.substring(0, source.length - '_id'.length);
+            return [
+                target,
+                (p: any) => childIds.add(p[source]),
+                (p: any) => p[target] = childMap.get(p[source]),
+            ]
+        } else if (source.endsWith('_ids')) {
+            const target = source.substring(0, source.length - '_ids'.length);
+            return [
+                target,
+                (p: any) => p[source].forEach((i: number) => childIds.add(i)),
+                (p: any) => {
+                    const result = [];
+                    for (const id of p[source]) {
+                        result.push(childMap.get(id));
+                    }
+                    p[target] = result;
+                },
+            ]
+        } else {
+            throw new Error(`No strategy to resolve field '${source}'`);
+        }
+    })();
+
+    const interested = (p: any) => p[target] === null;
+
+    // Collect child IDs
+    parentArray = parentArray.filter(interested);
+    parentArray.forEach(idExtractor);
+
+    // Get children
+    const children = await child.objects.getBulk(childIds, fields);
+    for (const child of children) {
+        childMap.set(child.id, child);
+    }
+
+    // Assign children
+    parentArray = parentArray.filter(interested);
+    parentArray.forEach(assigner);
 }
 
 export interface ModelClass<Model extends ModelBase> {

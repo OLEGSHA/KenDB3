@@ -48,6 +48,12 @@
                 <span class="minecraft-versions-separator">&ndash;</span>
                 <span class="minecraft-version-max">{{mcver:minecraft_version_max_id}}</span>
             {{/if}}
+            <span class="authors-label">Authors</span>
+            <span class="authors">
+                {{for authors}}
+                    <span class="author">{{>display_name}}</span>
+                {{/for}}
+            </span>
             <a href="{{:revision_of_id}}">Details</a>
         </li>
     </script>

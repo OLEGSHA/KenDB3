@@ -81,6 +81,10 @@ class _TypeScriptTemplates:  # namespace
             {field_name}: {field_type};
     ''')
 
+    RESOLVE_FIELD = _ts_template('''
+            {field_name}: {field_type} = null;
+    ''')
+
     FIELD_GROUP = _ts_template('''
             private '_fields_{group_name}': Status = Status.NotRequested;
     ''')
@@ -138,6 +142,17 @@ class _APIAutogenerator():
                 'field_name': field_name,
                 'field_type': 'any | null',
             }))
+
+            if field_name.endswith('_ids'):
+                output(templ.RESOLVE_FIELD.format(**{**ctxt,
+                    'field_name': field_name.removesuffix('_ids'),
+                    'field_type': 'ModelBase[] | null',
+                }))
+            elif field_name.endswith('_id'):
+                output(templ.RESOLVE_FIELD.format(**{**ctxt,
+                    'field_name': field_name.removesuffix('_id'),
+                    'field_type': 'ModelBase | null',
+                }))
 
         output('\n')
 

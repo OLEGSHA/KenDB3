@@ -8,7 +8,9 @@ import {
     Submission,
     SubmissionRevision,
     MinecraftVersion,
+    Profile,
     lastModified,
+    resolve,
 } from 'dataman';
 
 declare global {
@@ -45,6 +47,7 @@ class IndexViewmodule implements Viewmodule {
             subs.map((s) => s.latest_revision).filter((r) => r !== null),
             'basic'
         );
+        await resolve(revs, Profile, 'authors_ids', 'basic');
 
         rr.render('submission-list', 'index-entry', revs);
         rr.set('visible-count', revs.length);

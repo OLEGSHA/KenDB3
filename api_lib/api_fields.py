@@ -388,18 +388,20 @@ def _determine_field_meta(cls, name):
 
     # Check for RelatedManager
     if hasattr(attribute, 'related_manager_cls'):
-        return FieldMeta(name, _related_manager_get, _related_manager_set)
+        return FieldMeta(name + '_ids',
+                         _related_manager_get,
+                         _related_manager_set)
 
     return FieldMeta(name)
 
 
 def _related_manager_get(obj, name):
-    manager = getattr(obj, name)
+    manager = getattr(obj, name.removesuffix('_ids'))
     return [pk for (pk,) in manager.values_list('pk')]
 
 
 def _related_manager_set(obj, name, value):
-    manager = getattr(obj, name)
+    manager = getattr(obj, name.removesuffix('_ids'))
     objects = manager.model.objects.filter(pk__in=value)
     manager.set(objects)
 

@@ -7,10 +7,10 @@
     <script src="{% static 'bundles/submissions.bundle.js' %}"></script>
 {% endblock %}
 
-{% block jsrender_templates %}{% verbatim %}
+{% block jsrender_templates %}
 
     <script id="tmpl-index" type="text/x-jsrender">
-        {{!-- Submissions index toolbar and container --}}
+        <%!-- Submissions index toolbar and container --%>
         <div id="toolbar">
             <div id="search-and-filter">
                 <div>
@@ -34,59 +34,59 @@
     </script>
 
     <script id="tmpl-index-entry" type="text/x-jsrender">
-        {{!-- Submissions index loaded entry --}}
+        <%!-- Submissions index loaded entry --%>
         <li>
             <span class="id-label">ID</span>
-            <span class="id">{{>revision_of_id}}</span>
+            <span class="id"><%>revision_of_id%></span>
             <span class="name-label">Name</span>
-            <span class="name">{{>name ?? 'Untitled'}}</span>
+            <span class="name"><%>name ?? 'Untitled'%></span>
             <span class="revision-label">Map version</span>
-            <span class="revision">{{>revision_string}}</span>
+            <span class="revision"><%>revision_string%></span>
             <span class="minecraft-versions-label">for</span>
-            <span class="minecraft-version-min">{{mcver:minecraft_version_min_id}}</span>
-            {{if minecraft_version_min_id !== minecraft_version_max_id }}
+            <span class="minecraft-version-min"><%mcver:minecraft_version_min_id%></span>
+            <%if minecraft_version_min_id !== minecraft_version_max_id %>
                 <span class="minecraft-versions-separator">&ndash;</span>
-                <span class="minecraft-version-max">{{mcver:minecraft_version_max_id}}</span>
-            {{/if}}
+                <span class="minecraft-version-max"><%mcver:minecraft_version_max_id%></span>
+            <%/if%>
             <span class="authors-label">Authors</span>
             <span class="authors">
-                {{for authors}}
-                    <span class="author">{{>display_name}}</span>
-                {{/for}}
+                <%for authors%>
+                    <span class="author"><%>display_name%></span>
+                <%/for%>
             </span>
-            <a href="{{:revision_of_id}}">Details</a>
+            <a href="<%:revision_of_id%>">Details</a>
         </li>
     </script>
 
     <script id="tmpl-details" type="text/x-jsrender">
-        {{!-- Submission details --}}
+        <%!-- Submission details --%>
         <nav>
             <a href="./">All Submissions</a>
         </nav>
         <h1>
-            <span id="id">{{>revision_of_id}}</span>
+            <span id="id"><%>revision_of_id%></span>
             /
-            <span id="name">{{>name ?? 'Untitled'}}</span>
+            <span id="name"><%>name ?? 'Untitled'%></span>
         </h1>
         <div id="meta">
             <h2 id="meta-header">Information</h2>
             <span id="revision-label">Map version</span>
-            <span id="revision">{{>revision_string}}</span>
+            <span id="revision"><%>revision_string%></span>
             <span class="minecraft-versions-label">for</span>
-            <span class="minecraft-version-min">{{mcver:minecraft_version_min_id}}</span>
-            {{if minecraft_version_min_id !== minecraft_version_max_id }}
+            <span class="minecraft-version-min"><%mcver:minecraft_version_min_id%></span>
+            <%if minecraft_version_min_id !== minecraft_version_max_id %>
                 <span class="minecraft-versions-separator">&ndash;</span>
-                <span class="minecraft-version-max">{{mcver:minecraft_version_max_id}}</span>
-            {{/if}}
+                <span class="minecraft-version-max"><%mcver:minecraft_version_max_id%></span>
+            <%/if%>
         </div>
         <div id="description">
             <h2 id="rules-label">Rules</h2>
-            <div id="rules">{{>rules}}</div>
+            <div id="rules"><%>rules%></div>
             <h2 id="author-notes-label">Author Notes</h2>
-            <div id="author-notes">{{>author_notes}}</div>
+            <div id="author-notes"><%>author_notes%></div>
             <h2 id="editors-comment-label">Editors' Comment</h2>
-            <div id="editors-comment">{{>editors_comment}}</div>
+            <div id="editors-comment"><%>editors_comment%></div>
         </div>
     </script>
 
-{% endverbatim %}{% endblock %}
+{% endblock %}

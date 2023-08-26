@@ -1,5 +1,6 @@
 // Importing jsrender causes a TS2688 error due to references to jQuery.
 const jsrender = require('jsrender')();
+jsrender.views.settings.delimiters('<%', '%>');
 export { jsrender };
 
 import { getChildById } from 'common';

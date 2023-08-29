@@ -610,17 +610,15 @@ export class ModelBase {
      * source field names, e.g. 'authors_ids' (source) -> 'authors' (container).
      * This function populates
      *
-     * @param child the ModelClass of the children
      * @param source the field in parents that contains the IDs.
      *        Must be *_id or *_ids.
      * @param fields the child fields to get.
      */
-    resolve<ChildModel extends ModelBase>(
-        child: ModelClass<ChildModel>,
+    resolve(
         source: string,
         fields: string = '*'
     ): Promise<void> {
-        return resolve([this], child, source, fields);
+        return resolve([this], source, fields);
     }
 }
 
@@ -633,24 +631,25 @@ export class ModelBase {
  * This function populates
  *
  * @param parents the instances where IDs can be found
- * @param child the ModelClass of the children
  * @param source the field in parents that contains the IDs.
  *        Must be *_id or *_ids.
  * @param fields the child fields to get.
  */
 export async function resolve<
-    ParentModel extends ModelBase,
-    ChildModel extends ModelBase
+    ParentModel extends ModelBase
 >(
     parents: Iterable<ParentModel>,
-    child: ModelClass<ChildModel>,
     source: string,
     fields: string = '*',
 ): Promise<void> {
     let parentArray = Array.from(parents);
 
+    if (parentArray.length === 0) {
+        return;
+    }
+
     const childIds = new Set<number>();
-    const childMap = new Map<number, ChildModel>();
+    const childMap = new Map<number, ModelBase>();
 
     const [
         target, // Name of container field
@@ -689,7 +688,9 @@ export async function resolve<
     parentArray.forEach(idExtractor);
 
     // Get children
-    const children = await child.objects.getBulk(childIds, fields);
+    const parentClass = Object.getPrototypeOf(parentArray[0]).constructor;
+    const childClass = parentClass['_type_of_' + target];
+    const children = await childClass.objects.getBulk(childIds, fields);
     for (const child of children) {
         childMap.set(child.id, child);
     }

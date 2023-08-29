@@ -270,7 +270,7 @@ class APIEngine:
         groups can be a single str or an iterable of strs. If omitted, defaults
         to '*'.
         """
-        self.add_field(name, groups,
+        self.add_field(name + '_ids', groups,
                        getter=_related_manager_get,
                        setter=_related_manager_set)
 

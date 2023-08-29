@@ -5,10 +5,10 @@ import {
 import { Renderer, jsrender } from 'render';
 import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
 import {
-    Submission,
-    SubmissionRevision,
-    MinecraftVersion,
-    Profile,
+    Submissions,
+    SubmissionRevisions as Revisions,
+    MinecraftVersion, MinecraftVersions,
+    Profiles,
     lastModified,
     resolve,
 } from 'dataman';
@@ -29,7 +29,7 @@ declare global {
  */
 jsrender.views.converters('mcver', (() => {
     const versions: MinecraftVersion[] = [];
-    MinecraftVersion.objects.doOnceForEach((ver) => versions[ver.id] = ver);
+    MinecraftVersions.doOnceForEach((ver) => versions[ver.id] = ver);
 
     return (vid: number) => (
         versions[vid]?.display_name ?? error(`Unknown version ID ${vid}`)
@@ -42,12 +42,12 @@ class IndexViewmodule implements Viewmodule {
 
         rr.renderSelf('index');
 
-        const subs = await Submission.objects.getAll();
-        const revs = await SubmissionRevision.objects.getBulk(
+        const subs = await Submissions.getAll();
+        const revs = await Revisions.getBulk(
             subs.map((s) => s.latest_revision).filter((r) => r !== null),
             'basic'
         );
-        await resolve(revs, Profile, 'authors_ids', 'basic');
+        await resolve(revs, 'authors_ids', 'basic');
 
         rr.render('submission-list', 'index-entry', revs);
         rr.set('visible-count', revs.length);
@@ -64,12 +64,11 @@ class DetailsViewmodule implements Viewmodule {
         const rr = new Renderer(root);
         const id = Number(subpath.substring('/'.length));
 
-        const sub = await Submission.objects.get(id);
-        const rev = await SubmissionRevision.objects.get(
-            sub.latest_revision, '*');
+        const sub = await Submissions.get(id);
+        const rev = await Revisions.get(sub.latest_revision, '*');
 
-        Submission.objects.getAll().then(
-            (subs) => SubmissionRevision.objects.getBulk(
+        Submissions.getAll().then(
+            (subs) => Revisions.getBulk(
                 subs.map((s) => s.latest_revision).filter((r) => r !== null),
                 'basic'
             )
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const subpaths = new Subpaths();
     subpaths.register('/', index);
 
-    Submission.objects.doOnceForEach(
+    Submissions.doOnceForEach(
         (sub) => subpaths.register('/' + sub.id, details)
     );
 

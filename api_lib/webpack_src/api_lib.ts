@@ -619,8 +619,8 @@ export class ModelBase {
         child: ModelClass<ChildModel>,
         source: string,
         fields: string = '*'
-    ): void {
-        resolve([this], child, source, fields);
+    ): Promise<void> {
+        return resolve([this], child, source, fields);
     }
 }
 

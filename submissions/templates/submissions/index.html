@@ -87,6 +87,41 @@
             <h2 id="editors-comment-label">Editors' Comment</h2>
             <div id="editors-comment"><%>editors_comment%></div>
         </div>
+        <div id="appearances">
+            <h2 id="appearances-header">Appearances</h2>
+            <ul id="appearances-list">
+                <li>Loading...
+            </ul>
+        </div>
+    </script>
+
+    <script id="tmpl-appearance" type="text/x-jsrender">
+        <%!-- Appearance entry in submission details --%>
+        <li class="
+                role-<%attr:role%>
+                validity-<%attr:validity ?? 'na'%>
+                <%if revision.revision_of.latest_revision !== revision_id %>
+                    outdated
+                <%/if%>
+        ">
+            <h3><%>role%></h3>
+            <span class="authors-label">by</span>
+            <span class="authors">
+                <%for authors %>
+                    <span class="author"><%>display_name%></span>
+                <%/for%>
+            </span>
+            <span class="id-label">ID</span>
+            <span class="id"><%>id%></span>
+            <span class="link-label">Link</span>
+            <span class="link"><%>url%></span>
+            <%if revision.revision_of.latest_revision !== revision_id %>
+                <span class="outdated-label">Outdated:</span>
+                <span class="outdated"><%>revision.revision_string%></span>
+            <%/if%>
+            <span class="submitted-by-label">Submitted by</span>
+            <span class="submitted-by"><%>submitted_by.display_name%></span>
+        </li>
     </script>
 
 {% endblock %}

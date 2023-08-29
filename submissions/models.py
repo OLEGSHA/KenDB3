@@ -120,7 +120,12 @@ class Submission(models.Model):
         latest = self.get_latest_revision(raise_if_none=False)
         if latest:
             if latest.name:
-                name = repr(latest.name)
+                max_length = 25
+                if len(latest.name) >= max_length:
+                    name = latest.name[:max_length] + '\u2026' # ellipsis
+                else:
+                    name = latest.name
+                name = repr(name)
             else:
                 name = 'Untitled'
         else:
@@ -266,6 +271,8 @@ class SubmissionRevision(models.Model):
         blank=True,
     )
 
+    _api.add_related('appearances', ['*', 'basic'])
+
     last_modified = models.DateTimeField(
         help_text=('Last modification timestamp.'),
         auto_now=True,
@@ -273,3 +280,114 @@ class SubmissionRevision(models.Model):
 
     def __str__(self):
         return f"{self.revision_of} v{self.revision_string}"
+
+
+@api_model
+class Appearance(models.Model):
+    """Mention of a submission in a video or similar."""
+
+    _api = APIEngine()
+
+    url: _api('*') = models.CharField(
+        help_text=('Mention URL starting with <code>http[s]://</code> or '
+                   'a human-readable explanation. '
+                   'HTML will be retained for non-URL values.'),
+        max_length=URL_MAX_LENGTH,
+        blank=False,
+    )
+
+    revision: _api('*', 'search') = models.ForeignKey(
+        help_text=('Submission revision that appears in the material.'),
+        to=SubmissionRevision,
+        on_delete=models.CASCADE,
+        related_name='appearances',
+    )
+
+    added_at: _api('*') = models.DateTimeField(
+        help_text=('First time the appearance was added to the database.'),
+        auto_now_add=True,
+        blank=False,
+    )
+
+    authors: _api('*', 'search') = models.ManyToManyField(
+        help_text=('Users that should be credited as appearance authors.'),
+        to='profiles.Profile',
+        related_name='authored_appearances',
+        blank=False,
+    )
+
+    submitted_by: _api('*') = models.ForeignKey(
+        help_text=('User that submitted this appearance.'),
+        to='profiles.Profile',
+        on_delete=models.PROTECT,
+        related_name='submitted_appearances',
+        blank=False,
+    )
+
+    submission_method: _api('*') = models.TextField(
+        help_text=('Human-readable description of submission method, '
+                   'e.g. link to submission message. ',
+                   'Unsanitized HTML-disabled Markdown.'),
+        blank=False,
+    )
+
+    class Role(models.TextChoices):
+        CHEESE = 'chs', 'Cheese'
+        SOLUTION = 'sln', 'Solution'
+        INCOMPLETE = 'inc', 'Incomplete'
+        REVIEW = 'rvw', 'Review'
+        OTHER = 'etc', 'Other'
+
+    role: _api('*', 'search') = models.CharField(
+        help_text=('Role of this appearance as intended.'),
+        max_length=3,
+        choices=Role.choices,
+        default=Role.CHEESE,
+        blank=False,
+    )
+
+    class Validity(models.TextChoices):
+        """Validation state of a cheese, solution, or review.
+
+        NO_CONTEST  validity has not been questioned, assumed valid
+        CONTESTED   there is an ongoing or unresolved conflict
+        VALID       conflict settled as valid by parties or by editors
+        INVALID     editors believe entry is not valid when not retracted
+        RETRACTED   author issued a retraction, assumed invalid
+        NOT_APPLICABLE (None)  entry does not require validation
+        """
+        NO_CONTEST = 'noc', 'Not contested'
+        CONTESTED = 'cnt', 'Contested'
+        VALID = 'vld', 'Confirmed valid'
+        INVALID = 'inv', 'Invalid'
+        RETRACTED = 'rtr', 'Retracted'
+        NOT_APPLICABLE = '', 'N/A'
+
+    validity: _api('*', 'search') = models.CharField(
+        help_text=('Validation state of this appearance '
+                  'or blank if not applicable.'),
+        max_length=3,
+        choices=Validity.choices,
+        default=None,
+        blank=True,
+    )
+
+    author_notes: _api('*') = models.TextField(
+        help_text=('Brief author notes. '
+                   'Unsanitized HTML-disabled Markdown.'),
+        blank=True,
+    )
+
+    editors_comment: _api('*') = models.TextField(
+        help_text=("Database editors' comments. "
+                   'Unsanitized HTML-disabled Markdown.'),
+        blank=True,
+    )
+
+    last_modified = models.DateTimeField(
+        help_text=('Last modification timestamp.'),
+        auto_now=True,
+    )
+
+    def __str__(self):
+        return f"{self.get_role_display()} #{self.pk} of {self.revision}"

@@ -1,6 +1,7 @@
 import {
     formatTimestamp,
     error,
+    die,
 } from 'common';
 import { Renderer, jsrender } from 'render';
 import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
@@ -75,6 +76,19 @@ class DetailsViewmodule implements Viewmodule {
         );
 
         rr.renderSelf('details', rev);
+
+        // Render appearances later
+        sub.resolve('revisions_ids', 'basic').then(async (revs) => {
+            const apps = await resolve(revs, 'appearances_ids', '*');
+            await Promise.all([
+                resolve(revs, 'revision_of_id'),
+                resolve(apps, 'revision_id', 'basic'),
+                resolve(apps, 'authors_ids'),
+                resolve(apps, 'submitted_by_id'),
+            ]);
+
+            rr.render('appearances-list', 'appearance', apps);
+        });
 
         return {
             title: `Submission ${id}`,

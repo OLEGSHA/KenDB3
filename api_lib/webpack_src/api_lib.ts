@@ -612,12 +612,13 @@ export class ModelBase {
      *
      * @param source the field in parents that contains the IDs.
      *        Must be *_id or *_ids.
-     * @param fields the child fields to get.
+     * @param fields the child fields to get
+     * @returns all resolved instances as an array
      */
     resolve(
         source: string,
         fields: string = '*'
-    ): Promise<void> {
+    ): Promise<ModelBase[]> {
         return resolve([this], source, fields);
     }
 }
@@ -633,7 +634,8 @@ export class ModelBase {
  * @param parents the instances where IDs can be found
  * @param source the field in parents that contains the IDs.
  *        Must be *_id or *_ids.
- * @param fields the child fields to get.
+ * @param fields the child fields to get
+ * @returns all resolved instances as an array
  */
 export async function resolve<
     ParentModel extends ModelBase
@@ -641,12 +643,15 @@ export async function resolve<
     parents: Iterable<ParentModel>,
     source: string,
     fields: string = '*',
-): Promise<void> {
+): Promise<ModelBase[]> {
     let parentArray = Array.from(parents);
+    const allParents = Array.from(parentArray);
 
     if (parentArray.length === 0) {
-        return;
+        return [];
     }
+
+    const parentClass = Object.getPrototypeOf(allParents[0]).constructor;
 
     const childIds = new Set<number>();
     const childMap = new Map<number, ModelBase>();
@@ -655,6 +660,7 @@ export async function resolve<
         target, // Name of container field
         idExtractor,
         assigner,
+        resultProvider,
     ] = (() => {
         if (source.endsWith('_id')) {
             const target = source.substring(0, source.length - '_id'.length);
@@ -662,6 +668,7 @@ export async function resolve<
                 target,
                 (p: any) => childIds.add(p[source]),
                 (p: any) => p[target] = childMap.get(p[source]),
+                () => allParents.map((p: any) => p[target]),
             ]
         } else if (source.endsWith('_ids')) {
             const target = source.substring(0, source.length - '_ids'.length);
@@ -675,11 +682,19 @@ export async function resolve<
                     }
                     p[target] = result;
                 },
+                () => allParents.flatMap((p: any) => p[target]),
             ]
         } else {
-            throw new Error(`No strategy to resolve field '${source}'`);
+            throw new Error('No strategy to resolve'
+                            + parentClass.name + '.' + source);
         }
     })();
+
+    const childClass = parentClass['_type_of_' + target];
+    if (childClass === undefined) {
+        throw new Error(`Cannot resolve ${parentClass.name}.${source}: `
+                        + 'no child type available');
+    }
 
     const interested = (p: any) => p[target] === null;
 
@@ -688,8 +703,6 @@ export async function resolve<
     parentArray.forEach(idExtractor);
 
     // Get children
-    const parentClass = Object.getPrototypeOf(parentArray[0]).constructor;
-    const childClass = parentClass['_type_of_' + target];
     const children = await childClass.objects.getBulk(childIds, fields);
     for (const child of children) {
         childMap.set(child.id, child);
@@ -698,6 +711,8 @@ export async function resolve<
     // Assign children
     parentArray = parentArray.filter(interested);
     parentArray.forEach(assigner);
+
+    return resultProvider();
 }
 
 export interface ModelClass<Model extends ModelBase> {

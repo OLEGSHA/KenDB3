@@ -33,6 +33,18 @@ export function error(message: string): never {
 }
 
 /**
+ * Always throws an Error.
+ *
+ * Use like so:
+ *   const x: number = foo() ?? die(); // foo() should never return null
+ *
+ * @throws {Error} always
+ */
+export function die(): never {
+    throw new Error('Assertion failed');
+}
+
+/**
  * Get an HTMLElement by its ID or throw an Error.
  *
  * @param id the ID to find

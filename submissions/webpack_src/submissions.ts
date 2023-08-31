@@ -14,6 +14,8 @@ import {
     resolve,
 } from 'dataman';
 
+import './submissions.scss';
+
 declare global {
     interface Window {
         viewmoduleManager: ViewmoduleManager | null;

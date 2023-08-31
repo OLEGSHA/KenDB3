@@ -1,0 +1,8 @@
+/*
+ * Scuffed dark theme
+ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        filter: hue-rotate(180deg) invert(80%);
+    }
+}

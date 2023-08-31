@@ -37,6 +37,21 @@ jsrender.views.converters('mcver', (() => {
     );
 })());
 
+/*
+ * JsRender helper app_roles
+ *
+ * A mapping from appearance role codes to user-friendly names.
+ *
+ * @type { {[key: string]: string} }
+ */
+jsrender.views.helpers('app_roles', {
+    'chs': 'Cheese',
+    'sln': 'Solution',
+    'inc': 'Incomplete',
+    'rvw': 'Review',
+    'etc': 'Other',
+})
+
 class IndexViewmodule implements Viewmodule {
     async install(root: HTMLElement, subpath: string) {
         const rr = new Renderer(root);
@@ -71,7 +86,6 @@ class DetailsViewmodule implements Viewmodule {
             rev.resolve('authors_ids', 'basic'),
             rev.resolve('submitted_by_id', 'basic')
         ]);
-        console.log(rev);
 
         Submissions.getAll().then(
             (subs) => Revisions.getBulk(

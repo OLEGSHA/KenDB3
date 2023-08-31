@@ -3,7 +3,7 @@ const jsrender = require('jsrender')();
 jsrender.views.settings.delimiters('<%', '%>');
 export { jsrender };
 
-import { getChildById } from 'common';
+import { getChildById } from './common';
 
 /**
  * A wrapper for an HTMLElement to facilitate rendering or filling in elements.

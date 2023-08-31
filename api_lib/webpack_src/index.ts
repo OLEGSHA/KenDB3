@@ -6,7 +6,7 @@ export {
     lastModified,
     resolve,
 } from './api_lib';
-import { debug, error, getInjection } from 'common';
+import { debug, error, getInjection } from 'util/common';
 
 /**
  * Load injected packets.

@@ -1,4 +1,4 @@
-import { debug, error } from 'common'
+import { debug, error } from 'util/common';
 
 /**
  * Manages model instances of one type.

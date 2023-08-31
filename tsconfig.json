@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
     "paths": {
-      "common": ["./javascript_pipeline/webpack_src/common.ts"],
-      "viewmodule": ["./viewmodule/webpack_src/viewmodule.ts"],
-      "dataman": ["./api_lib/webpack_src/dataman.ts"],
-      "render": ["./javascript_pipeline/webpack_src/render.ts"]
+      "util/*": ["./javascript_pipeline/webpack_src/*"],
+      "viewmodule": ["./viewmodule/webpack_src"],
+      "dataman": ["./api_lib/webpack_src"]
     },
     "target": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "noEmit": true,
     "strict": true,
     "isolatedModules": true,

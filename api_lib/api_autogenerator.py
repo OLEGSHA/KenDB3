@@ -37,7 +37,7 @@ class _TypeScriptTemplates:  # namespace
          * Generator: {me}
          * Generated at: {date}
          *
-         * Model class declarations for dataman.ts
+         * Model class declarations for dataman
          */
 
         import {{
@@ -47,7 +47,7 @@ class _TypeScriptTemplates:  # namespace
             manageModel,
             Status,
         }} from './api_lib';
-        import {{ getInjection }} from 'common';
+        import {{ getInjection }} from 'util/common';
 
         /**
          * Create a ModelManager and store it in modelClass.objects.

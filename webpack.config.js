@@ -1,4 +1,4 @@
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -14,7 +14,7 @@ module.exports = (env, argv) => {
       path: as_path('static/bundles'),
     },
     resolve: {
-      extensions: ['.js', '.ts'],
+      extensions: ['.js', '.ts', '.sass', '.scss'],
       alias: yankAliasesFromTsconfig(),
     },
     module: {
@@ -62,11 +62,22 @@ module.exports = (env, argv) => {
 function yankAliasesFromTsconfig() {
   const fs = require('fs');
   const tsconfig = JSON.parse(fs.readFileSync('./tsconfig.json'));
-  const paths = tsconfig.compilerOptions.paths
+  const paths = tsconfig.compilerOptions.paths;
+
+  removeSuffix = (str, suffix) => {
+    if (str.endsWith(suffix)) {
+      return str.slice(0, -suffix.length);
+    } else {
+      return str;
+    }
+  };
 
   const result = {};
-  for (const alias in paths) {
-    result[alias] = as_path(paths[alias][0]);
+  for (const [tsAlias, tsPaths] of Object.entries(paths)) {
+    const alias = removeSuffix(tsAlias, '/*');
+    const path = removeSuffix(tsPaths[0], '/*');
+    result[alias] = as_path(path);
   }
+
   return result;
 }

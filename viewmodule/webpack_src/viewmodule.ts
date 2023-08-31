@@ -22,7 +22,7 @@ import {
     debug,
     error,
     getElementByIdOrDie
-} from 'common'
+} from 'util/common';
 
 /**
  * A viewmodule.

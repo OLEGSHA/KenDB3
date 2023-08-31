@@ -2,8 +2,8 @@ import {
     formatTimestamp,
     error,
     die,
-} from 'common';
-import { Renderer, jsrender } from 'render';
+} from 'util/common';
+import { Renderer, jsrender } from 'util/render';
 import { Viewmodule, Subpaths, ViewmoduleManager } from 'viewmodule';
 import {
     Submissions,

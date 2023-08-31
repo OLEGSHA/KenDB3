@@ -67,6 +67,11 @@ class DetailsViewmodule implements Viewmodule {
 
         const sub = await Submissions.get(id);
         const rev = await Revisions.get(sub.latest_revision, '*');
+        await Promise.all([
+            rev.resolve('authors_ids', 'basic'),
+            rev.resolve('submitted_by_id', 'basic')
+        ]);
+        console.log(rev);
 
         Submissions.getAll().then(
             (subs) => Revisions.getBulk(

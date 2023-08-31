@@ -7,6 +7,26 @@
         {% block head %}{% endblock %}
     </head>
     <body>
-        {% block content %}{% endblock %}
+        <header>
+            <h1>KenDB</h1>
+            <nav>
+                <ul id="header-links-list">
+                    <li><a href="https://example.org">Something</a>
+                    <li><a href="https://example.org">More</a>
+                    <li><a href="https://example.org">Links!</a>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <div id="copyright">&copy; OLEGSHA 2023</div>
+            <ul id="footer-links-list">
+                <li><a href="https://example.org">Something</a>
+                <li><a href="https://example.org">More</a>
+                <li><a href="https://example.org">Links!</a>
+            </ul>
+        </footer>
     </body>
 </html>

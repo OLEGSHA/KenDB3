@@ -4,15 +4,11 @@ This is the source code of KenDB3, intended to go live on https://kendb.windcorp
 
 Up-to-date task tree: [kendb3-plan.drawio.svg](https://windcorp.ru/other/kendb3-plan.drawio.svg).
 
-## Approach and stack
+## Approach
 
 KenDB3 is a web application – as much processing as reasonable should happen on the frontend. The goal is to reduce load times for the visitors and Internet traffic for the host.
 
-KenDB3 will use Django as backend, with a REST-like API to access most of the data.
-
-Frontend will not use any frameworks. A basic NPM and Webpack pipeline will be used.
-
-The site will be deployed using docker-compose. It will use PostgreSQL as its production database.
+For pages with dynamic content, frontend is highly autonomous; it communicates with the host using a REST-like API.
 
 ## Developer setup
 
@@ -51,16 +47,23 @@ See [Django 4.2 documentation](https://docs.djangoproject.com/en/4.2/) for more 
 
 Project is not production-ready yet. Migrations will be committed once the code is deployed on windcorp.ru.
 
-## Dependencies
+## Stack
 
-- **Backend**: [Django](https://djangoproject.com/) 4.2
-  - [django-environ](https://pypi.org/project/django-environ/) – override settings.py with environment variables
-  - [django-taggit](https://pypi.org/project/django-taggit/) – tag management
 - **Frontend**:
   - [NPM](https://npmjs.com) – package management
   - [Webpack](https://webpack.js.org/) – resource bundling
-  - [Babel](https://babeljs.io) – resource preprocessing
-  - [JsRender](https://www.jsviews.com/#jsrender) – lightweight clientside HTML renderer
+  - [TypeScript](https://www.typescriptlang.org/) – JavaScript with type checking
+    - [Babel](https://babeljs.io) – preprocessor
+    - [JsRender](https://www.jsviews.com/#jsrender) – lightweight clientside HTML renderer
+  - [Sass](https://sass-lang.com/) – enhanced CSS
+  - served as Django static files
+- **Backend**:
+  - [Django](https://djangoproject.com/) – Python web framework
+    - [django-environ](https://pypi.org/project/django-environ/) – override `settings.py` with environment variables
+    - [django-taggit](https://pypi.org/project/django-taggit/) – tag management
+  - Production database: [Dolt](https://github.com/dolthub/dolt) – MySQL-compatible database with version control _(not yet implemented)_
+- **Deployment**: _(not yet implemented)_
+  - something something [Gitea](https://gitea.io/) actions + [Docker](https://www.docker.com/)
 
 ## License and reuse
 

@@ -18,7 +18,11 @@
  * 'viewmodule-root', also known as 'viewmodule root'.
  */
 
-import { debug, getElementByIdOrDie } from 'common'
+import {
+    debug,
+    error,
+    getElementByIdOrDie
+} from 'common'
 
 /**
  * A viewmodule.
@@ -90,7 +94,13 @@ export class ViewmoduleManager {
     /**
      * Base path.
      */
-    private _base: string;
+    private readonly _base: string;
+
+    /**
+     * A function that outputs document title for a title suggested
+     * by submodule.
+     */
+    private readonly titleFunction: (sub: string) => string;
 
     /**
      * Last installed subpath or null.
@@ -129,10 +139,11 @@ export class ViewmoduleManager {
                 }
             }
         }
-        if (base == null) {
-            throw new Error(`Path '${path}' did not match any registration`);
-        }
-        this._base = base;
+        this._base = base ?? error(`Path '${path}' is unknown`);
+
+        // Determine title function
+        // (Cheat)
+        this.titleFunction = (s) => `${s} | KenDB`;
 
         // Setup listeners
         document.addEventListener('click',
@@ -239,7 +250,7 @@ export class ViewmoduleManager {
         this._installedSubpath = subpath;
         viewmodule.install(newRoot, subpath)
             .then((wishes) => {
-                document.title = wishes.title;
+                document.title = this.titleFunction(wishes.title);
             });
     }
 

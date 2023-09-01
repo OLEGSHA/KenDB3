@@ -1,0 +1,46 @@
+/*
+ * Theme definitions
+ */
+@mixin theme-light-def {
+    --color-bg: #f5f8fa;
+    --color-fg: #333333;
+}
+
+@mixin theme-dark-def {
+    --color-bg: #30383c;
+    --color-fg: #DDDDDD;
+}
+
+/*
+ * Select theme
+ */
+
+// Default
+@media not (prefers-color-scheme: dark) {
+    body {
+        @include theme-light-def;
+    }
+}
+
+// Use dark theme if preferred
+@media (prefers-color-scheme: dark) {
+    body {
+        @include theme-dark-def;
+    }
+}
+
+// Regardless of either, use forced theme
+body.theme-light {
+    @include theme-light-def;
+}
+body.theme-dark {
+    @include theme-dark-def;
+}
+
+/*
+ * Apply theme
+ */
+body {
+    color: var(--color-fg);
+    background: var(--color-bg);
+}

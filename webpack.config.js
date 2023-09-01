@@ -4,10 +4,17 @@ const webpack = require('webpack');
 
 const as_path = (subpath) => path.resolve(__dirname, subpath);
 
+const insertEverywhere =
+  './javascript_pipeline/webpack_src/insert_everywhere.ts';
+
 module.exports = (env, argv) => {
   return {
     entry: {
-      submissions: './submissions/webpack_src/submissions.ts',
+      submissions: [
+        './submissions/webpack_src/submissions.ts',
+        insertEverywhere,
+      ],
+      basic: insertEverywhere,
     },
     output: {
       filename: '[name].bundle.js',

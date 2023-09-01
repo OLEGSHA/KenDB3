@@ -58,24 +58,26 @@ export class Cookie extends EventTarget {
      * becomes available.
      */
     constructor(
-        name: string,
-        expiration: number,
-        autoRefresh: boolean,
-        meta: CookieMeta,
+        data: {
+            name: string,
+            expiration: number,
+            autoRefresh: boolean,
+            meta: CookieMeta,
+        },
         ...firstListener: any[]
     ) {
         super();
 
-        this.name = name;
-        this.expiration = expiration;
-        this.autoRefresh = autoRefresh;
+        this.name = data.name;
+        this.expiration = data.expiration;
+        this.autoRefresh = data.autoRefresh;
 
         this.meta = {
             ...{
                 isEssential: false,
                 description: undefined,
             },
-            ...meta
+            ...data.meta
         };
 
         if (this.meta.description === undefined) {

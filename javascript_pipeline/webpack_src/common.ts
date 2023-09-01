@@ -119,8 +119,11 @@ export function getInjection<T>(id: string, cache: boolean = true): T {
     return value as T;
 }
 
-/*
+/**
  * Formats given Date object, e.g. 2023-02-28 11:39. Local timezone is used.
+ *
+ * @param ts the date to format
+ * @returns the formatted date
  */
 export function formatTimestamp(ts: Date): string {
     const pad = function(obj: any, minLength: number): string {
@@ -136,4 +139,48 @@ export function formatTimestamp(ts: Date): string {
            pad(ts.getDate(), 2) + ' ' +
            pad(ts.getHours(), 2) + ':' +
            pad(ts.getMinutes(), 2);
+}
+
+/**
+ * Ensure that only certain CSS classes out of a family are present.
+ *
+ * A family includes all classes that begin with prefix.
+ *
+ * Example:
+ *
+ *   theDiv = <div class="foo-cat bar-egg ham foo-fish">
+ *   setClasses(theDiv, 'foo-', ['cat', 'foo-dog']);
+ *   // theDiv now has class="foo-cat bar-egg ham foo-dog"
+ *
+ * @param element the element to modify
+ * @param prefix the prefix to manage
+ * @param allowed CSS class or classes to retain or add. prefix is prepended to
+ *        classes do not start with it.
+ */
+export function setClasses(
+    element: HTMLElement,
+    prefix: string,
+    allowed: string | Iterable<string>,
+): void {
+    const desiredClasses =
+        ((typeof allowed === 'string') ? [allowed] : Array.from(allowed))
+        .map((s) => s.startsWith(prefix) ? s : prefix + s);
+
+    const currentClasses =
+        Array.from(element.classList)
+        .filter((s) => s.startsWith(prefix));
+
+    // Remove classes that are no longer needed
+    for (const currentClass of currentClasses) {
+        if (!desiredClasses.includes(currentClass)) {
+            element.classList.remove(currentClass);
+        }
+    }
+
+    // Add missing classes
+    for (const desiredClass of desiredClasses) {
+        if (!currentClasses.includes(desiredClass)) {
+            element.classList.add(desiredClass);
+        }
+    }
 }

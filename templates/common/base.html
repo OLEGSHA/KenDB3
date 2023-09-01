@@ -16,7 +16,9 @@
                     <li><a href="https://example.org">Links!</a>
                 </ul>
             </nav>
-            <div id="theme-buttons" aria-hidden="true"></div>
+            <div id="theme-buttons-wrapper" aria-hidden="true" tabindex="0">
+                <div id="theme-buttons"></div>
+            </div>
         </header>
         <main>
             {% block content %}{% endblock %}

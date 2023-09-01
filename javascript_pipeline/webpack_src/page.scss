@@ -1,0 +1,154 @@
+/*
+ * Page setup
+ */
+
+/*
+ * Page sizing
+ */
+body {
+    max-width: 65rem;
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+/*
+ * Stretch page vertically
+ */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/*
+ * Background
+ */
+body {
+    background-image: linear-gradient(
+        to bottom,
+        var(--color-bg-top),
+        66%,
+        var(--color-bg-bottom)
+    );
+}
+
+/*
+ * Header
+ */
+header {
+
+    /*
+     * Layout
+     */
+    display: grid;
+    grid-template-areas:
+        "_1  title theme"
+        "nav nav   nav  ";
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto auto;
+    > h1 {
+        grid-area: title;
+    }
+    > #theme-buttons-wrapper {
+        grid-area: theme;
+        align-self: top;
+        justify-self: end;
+    }
+    > nav {
+        grid-area: nav;
+    }
+
+    /*
+     * Title font
+     */
+    > h1 {
+        font-family: var(--font-serif);
+        font-size: 3em;
+        font-weight: bold;
+    }
+
+}
+
+/*
+ * Theme buttons
+ */
+#theme-buttons-wrapper {
+    $size: 3em;
+    $padding: 1em;
+
+    width: $size;
+    height: $size;
+    background: green;
+
+    display: flex;
+    flex-direction: column;
+
+    &::before {
+        content: '';
+        width: $size;
+        flex: $size 0 0;
+        background: red;
+    }
+
+    #theme-buttons {
+        background: blue;
+        display: grid;
+        grid-template-columns: $size;
+        grid-auto-rows: $size;
+    }
+
+    /*
+     * Pad and gap buttons container
+     */
+    #theme-buttons {
+        padding: $padding;
+        gap: $padding;
+        margin: {
+            top: $padding;
+            left: -1 * $padding;
+            right: -1 * $padding;
+            bottom: 0;
+        }
+    }
+
+    /*
+     * Position the buttons container on top
+     */
+    #theme-buttons {
+        z-index: 1;
+    }
+
+    /*
+     * Buttons
+     */
+    #theme-buttons {
+        /*
+         * Common style
+         */
+        > button {
+            background: white;
+        }
+    }
+
+    /*
+     * Visibility of buttons container
+     */
+    #theme-buttons {
+        visibility: hidden;
+    }
+
+    &:focus-within #theme-buttons {
+        visibility: visible;
+    }
+}
+
+/*
+ * De-emphasise footer
+ */
+footer {
+    color: var(--color-fg-deemph);
+}

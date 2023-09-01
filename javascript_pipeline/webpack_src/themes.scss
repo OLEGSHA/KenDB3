@@ -1,14 +1,22 @@
+@use 'sass:color';
+
 /*
  * Theme definitions
  */
 @mixin theme-light-def {
-    --color-bg: #f5f8fa;
-    --color-fg: #333333;
+    --color-bg-top: #f5f8fa;
+    --color-bg-bottom: #aac5d5;
+    $color-fg: #333333;
+    --color-fg: #{$color-fg};
+    --color-fg-deemph: #{color.change($color-fg, $alpha: 0.5)};
 }
 
 @mixin theme-dark-def {
-    --color-bg: #30383c;
-    --color-fg: #DDDDDD;
+    --color-bg-top: #30383c;
+    --color-bg-bottom: #2b4757;
+    $color-fg: #dddddd;
+    --color-fg: #{$color-fg};
+    --color-fg-deemph: #{color.change($color-fg, $alpha: 0.5)};
 }
 
 /*

@@ -1,6 +1,7 @@
 /*
  * Page setup
  */
+@use 'constants';
 
 /*
  * Page sizing
@@ -55,7 +56,7 @@ header {
     }
     > #theme-buttons-wrapper {
         grid-area: theme;
-        align-self: top;
+        align-self: center;
         justify-self: end;
     }
     > nav {
@@ -77,21 +78,36 @@ header {
  * Theme buttons
  */
 #theme-buttons-wrapper {
-    $size: 3em;
+    $size: 2em;
     $padding: 1em;
 
     width: $size;
     height: $size;
-    background: green;
 
     display: flex;
     flex-direction: column;
 
     &::before {
+        /*
+         * Sizing
+         */
         content: '';
-        width: $size;
-        flex: $size 0 0;
-        background: red;
+        $margin: $size / 6;
+        width: $size - 2*$margin;
+        flex: $size - 2*$margin 0 0;
+        margin: $margin;
+        box-sizing: border-box;
+
+        /*
+         * Appearance
+         */
+        background-image: linear-gradient(
+            to right,
+            transparent 0 50%,
+            var(--color-fg) 50% 100%,
+        );
+        border-radius: 50%;
+        border: constants.$line solid var(--color-fg);
     }
 
     #theme-buttons {
@@ -99,6 +115,21 @@ header {
         display: grid;
         grid-template-columns: $size;
         grid-auto-rows: $size;
+    }
+
+    /*
+     * Theme menu button appearance
+     */
+    border-radius: 25%;
+    background: transparent;
+    &:hover,
+    &:focus-within {
+        cursor: pointer;
+        background: var(--color-fg);
+
+        &::before {
+            --color-fg: var(--color-bg-top); // FIXME rework bg colors
+        }
     }
 
     /*

@@ -29,12 +29,7 @@ footer {
  * Background
  */
 body {
-    background-image: linear-gradient(
-        to bottom,
-        var(--color-bg-top),
-        66%,
-        var(--color-bg-bottom)
-    );
+    background: var(--bg);
 }
 
 /*
@@ -92,7 +87,7 @@ header {
          * Sizing
          */
         content: '';
-        $margin: $size / 6;
+        $margin: calc($size / 6);
         width: $size - 2*$margin;
         flex: $size - 2*$margin 0 0;
         margin: $margin;
@@ -128,7 +123,7 @@ header {
         background: var(--color-fg);
 
         &::before {
-            --color-fg: var(--color-bg-top); // FIXME rework bg colors
+            --color-fg: var(--color-bg);
         }
     }
 

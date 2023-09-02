@@ -3,20 +3,39 @@
 /*
  * Theme definitions
  */
-@mixin theme-light-def {
-    --color-bg-top: #f5f8fa;
-    --color-bg-bottom: #aac5d5;
-    $color-fg: #333333;
+@function make-bg-gradient($base) {
+    @return linear-gradient(
+        to bottom,
+        color.mix($base, hsl(188, 90%, 80%), 90%),
+        66%,
+        color.mix($base, hsl(188, 90%, 40%), 60%),
+    );
+}
+
+@mixin theme-definer(
+    $color-fg,
+    $color-bg,
+    $color-bg-alt,
+    $color-links,
+) {
+    --bg: #{make-bg-gradient($color-bg) fixed};
+    --bg-alt: #{make-bg-gradient($color-bg-alt) fixed};
+
+    --color-bg: #{$color-bg};
+    --color-bg-alt: #{$color-bg-alt};
     --color-fg: #{$color-fg};
-    --color-fg-deemph: #{color.change($color-fg, $alpha: 0.5)};
+    --color-fg-deemph: #{color.mix($color-fg, $color-bg)};
+    --color-accent: #ee2222;
+    --color-links: #{$color-links};
+    --color-shadow: #00000088;
+}
+
+@mixin theme-light-def {
+    @include theme-definer(#333333, #f5f8fa, #e2e8eb, #0000ff);
 }
 
 @mixin theme-dark-def {
-    --color-bg-top: #30383c;
-    --color-bg-bottom: #2b4757;
-    $color-fg: #dddddd;
-    --color-fg: #{$color-fg};
-    --color-fg-deemph: #{color.change($color-fg, $alpha: 0.5)};
+    @include theme-definer(#dddddd, #30383c, #4c555a, #0000ff);
 }
 
 /*
@@ -25,19 +44,19 @@
 
 // Default
 @media not (prefers-color-scheme: dark) {
-    body {
+    body:not(.theme-light):not(.theme-dark) {
         @include theme-light-def;
     }
 }
 
 // Use dark theme if preferred
 @media (prefers-color-scheme: dark) {
-    body {
+    body:not(.theme-light):not(.theme-dark) {
         @include theme-dark-def;
     }
 }
 
-// Regardless of either, use forced theme
+// Forced themes
 body.theme-light {
     @include theme-light-def;
 }
@@ -50,5 +69,4 @@ body.theme-dark {
  */
 body {
     color: var(--color-fg);
-    background: var(--color-bg);
 }

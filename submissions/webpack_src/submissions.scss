@@ -1,5 +1,6 @@
 @use 'util/base';
 
 main {
-    border: solid 2px yellow;
+    // border: solid 2px yellow;
+    background: var(--color-bg);
 }

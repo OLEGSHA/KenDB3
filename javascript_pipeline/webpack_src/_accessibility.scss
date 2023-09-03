@@ -1,0 +1,20 @@
+@use 'constants';
+
+/*
+ * Outline for focused elements
+ */
+* {
+    outline: {
+        color: transparent;
+        style: solid;
+        width: constants.$line;
+        offset: 0;
+    }
+}
+
+*:focus-visible {
+    outline: {
+        color: var(--color-accent);
+        offset: constants.$line;
+    }
+}

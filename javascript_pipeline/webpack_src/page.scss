@@ -2,6 +2,7 @@
  * Page setup
  */
 @use 'constants';
+@use 'theme_switch';
 
 /*
  * Page sizing
@@ -67,109 +68,6 @@ header {
         font-weight: bold;
     }
 
-}
-
-/*
- * Theme buttons
- */
-#theme-buttons-wrapper {
-    $size: 2em;
-    $padding: 1em;
-
-    width: $size;
-    height: $size;
-
-    display: flex;
-    flex-direction: column;
-
-    &::before {
-        /*
-         * Sizing
-         */
-        content: '';
-        $margin: calc($size / 6);
-        width: $size - 2*$margin;
-        flex: $size - 2*$margin 0 0;
-        margin: $margin;
-        box-sizing: border-box;
-
-        /*
-         * Appearance
-         */
-        background-image: linear-gradient(
-            to right,
-            transparent 0 50%,
-            var(--color-fg) 50% 100%,
-        );
-        border-radius: 50%;
-        border: constants.$line solid var(--color-fg);
-    }
-
-    #theme-buttons {
-        background: blue;
-        display: grid;
-        grid-template-columns: $size;
-        grid-auto-rows: $size;
-    }
-
-    /*
-     * Theme menu button appearance
-     */
-    border-radius: 25%;
-    background: transparent;
-    &:hover,
-    &:focus-within {
-        cursor: pointer;
-        background: var(--color-fg);
-
-        &::before {
-            --color-fg: var(--color-bg);
-        }
-    }
-
-    /*
-     * Pad and gap buttons container
-     */
-    #theme-buttons {
-        padding: $padding;
-        gap: $padding;
-        margin: {
-            top: $padding;
-            left: -1 * $padding;
-            right: -1 * $padding;
-            bottom: 0;
-        }
-    }
-
-    /*
-     * Position the buttons container on top
-     */
-    #theme-buttons {
-        z-index: 1;
-    }
-
-    /*
-     * Buttons
-     */
-    #theme-buttons {
-        /*
-         * Common style
-         */
-        > button {
-            background: white;
-        }
-    }
-
-    /*
-     * Visibility of buttons container
-     */
-    #theme-buttons {
-        visibility: hidden;
-    }
-
-    &:focus-within #theme-buttons {
-        visibility: visible;
-    }
 }
 
 /*

@@ -30,12 +30,23 @@
     --color-shadow: #00000088;
 }
 
+$bg-light: #f5f8fa;
+$bg-dark: #30383c;
+
 @mixin theme-light-def {
-    @include theme-definer(#333333, #f5f8fa, #e2e8eb, #0000ff);
+    @include theme-definer(#333333, $bg-light, #e2e8eb, #0000ff);
 }
 
 @mixin theme-dark-def {
-    @include theme-definer(#dddddd, #30383c, #4c555a, #0000ff);
+    @include theme-definer(#dddddd, $bg-dark, #4c555a, #0000ff);
+}
+
+/*
+ * Variables for theme selection
+ */
+body {
+    --theme-light-color-bg: #{$bg-light};
+    --theme-dark-color-bg: #{$bg-dark};
 }
 
 /*

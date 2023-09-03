@@ -1,0 +1,158 @@
+@use 'constants';
+
+$size: 2em;
+$icon-border-radius: calc($size / 4);
+$padding: constants.$line;
+
+@mixin theme-icon($fill) {
+    &::before {
+        /*
+         * Sizing
+         */
+        content: '';
+        $margin: calc($size / 6);
+        width: $size - 2*$margin;
+        flex: $size - 2*$margin 0 0;
+        margin: $margin;
+        box-sizing: border-box;
+
+        /*
+         * Appearance
+         */
+        background-image: $fill;
+        border-radius: 50%;
+        border: constants.$line solid var(--color-fg);
+    }
+}
+
+/*
+ * Theme buttons
+ */
+#theme-buttons-wrapper {
+
+    width: $size;
+    height: $size;
+
+    display: flex;
+    flex-direction: column;
+
+    @include theme-icon(linear-gradient(
+        to right,
+        transparent 0 50%,
+        var(--color-fg) 50% 100%,
+    ));
+
+    #theme-buttons {
+        background: blue;
+        display: grid;
+        grid-template-columns: $size;
+        grid-auto-rows: $size;
+    }
+
+    /*
+     * Theme menu button appearance
+     */
+    border-radius: $icon-border-radius;
+    background: transparent;
+    &:hover,
+    &:focus-within {
+        cursor: pointer;
+        background: var(--color-fg);
+
+        &::before {
+            --color-fg: var(--color-bg);
+        }
+    }
+
+    /*
+     * Pad and gap buttons container
+     */
+    #theme-buttons {
+        padding: $padding;
+        gap: $padding;
+        margin: {
+            top: $padding;
+            left: -1 * $padding;
+            right: -1 * $padding;
+            bottom: 0;
+        }
+    }
+
+    /*
+     * Position the buttons container on top
+     */
+    #theme-buttons {
+        z-index: 1;
+    }
+
+    /*
+     * Buttons
+     */
+    #theme-buttons {
+        /*
+         * Common style
+         */
+        cursor: initial;
+        background: var(--bg-alt);
+        border-radius: calc($icon-border-radius + $padding);
+        box-shadow: 0 0 1em var(--color-shadow);
+
+        > button {
+            cursor: pointer;
+            border-radius: $icon-border-radius;
+            background: transparent;
+
+            display: flex;
+            @include theme-icon(null);
+
+        }
+
+        /*
+         * Selected theme highlighting
+         */
+        > button {
+            body.theme-light &.light,
+            body.theme-dark &.dark,
+            body:not(.theme-light):not(.theme-dark) &.auto {
+                background: var(--color-fg);
+
+                &::before {
+                    --color-fg: var(--color-bg);
+                }
+            }
+        }
+
+        /*
+         * Individual icons
+         */
+        > button {
+            &.auto::before {
+                background: linear-gradient(
+                    to right,
+                    transparent 0 50%,
+                    var(--color-fg) 50% 100%,
+                );
+            }
+
+            &.light::before {
+                background: var(--theme-light-color-bg);
+            }
+
+            &.dark::before {
+                background: var(--theme-dark-color-bg);
+            }
+        }
+
+    }
+
+    /*
+     * Visibility of buttons container
+     */
+    #theme-buttons {
+        visibility: hidden;
+    }
+
+    &:focus-within #theme-buttons {
+        visibility: visible;
+    }
+}

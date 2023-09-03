@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const option of options) {
         const str = option ?? 'auto';
         const button = document.createElement('button');
-        button.textContent = `Enable ${str} theme`;
         button.type = 'button';
         button.classList.add(str);
         button.addEventListener('click', () => setTheme(option));

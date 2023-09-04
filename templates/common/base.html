@@ -20,10 +20,18 @@
                 KenDB
             </h1>
             <nav>
+                <input type="checkbox" id="header-links-expand"
+                       autocomplete="off" hidden/>
                 <ul id="header-links-list">
+                    <li id="header-links-expand-wrapper">
+                        <label for="header-links-expand"
+                               aria-hidden="true"></label>
                     <li><a href="https://example.org">Something</a>
-                    <li><a href="https://example.org">More</a>
-                    <li><a href="https://example.org">Links!</a>
+                    <li><a href="https://example.org">Unprotected SQL</a>
+                    <li><a href="https://example.org">XSS</a>
+                    <li class="current">
+                        <a href="https://example.org">Submissions</a>
+                    <li><a href="https://example.org">Gateway into LAN</a>
                 </ul>
             </nav>
             <div id="theme-buttons-wrapper" aria-hidden="true" tabindex="0">

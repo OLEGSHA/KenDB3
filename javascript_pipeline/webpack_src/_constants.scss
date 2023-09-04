@@ -11,3 +11,13 @@ $line: 0.2375rem;
  * Height of capital latin letters in sans font
  */
 $glyph-height: 0.72875rem;
+
+/*
+ * @media rule targeting narrow enough screens to use narrow layouts
+ */
+$is-narrow: "screen and (max-width: 45rem)";
+
+/*
+ * Negation of $is-narrow
+ */
+$is-wide: "not #{$is-narrow}";

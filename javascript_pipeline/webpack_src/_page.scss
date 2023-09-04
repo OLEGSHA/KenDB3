@@ -3,6 +3,7 @@
  */
 @use 'constants';
 @use 'theme_switch';
+@use 'top_navbar';
 
 /*
  * Page sizing
@@ -19,6 +20,7 @@ body {
 body {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     min-height: 100vh;
 }
 
@@ -59,6 +61,7 @@ header {
     }
     > nav {
         grid-area: nav;
+        min-width: 0;
     }
 
     $title-size: 3rem;

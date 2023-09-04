@@ -1,0 +1,13 @@
+/*
+ * Various utility functions and mixins
+ */
+
+@mixin inverted() {
+    color: var(--color-bg);
+    background: var(--color-fg);
+}
+
+@mixin mask($value) {
+    mask: $value;
+    -webkit-mask: $value;
+}

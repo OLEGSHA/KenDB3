@@ -103,8 +103,8 @@ $padding: constants.$line;
             background: transparent;
 
             display: flex;
+            flex-direction: column;
             @include theme-icon(null);
-
         }
 
         /*
@@ -150,9 +150,11 @@ $padding: constants.$line;
      */
     #theme-buttons {
         visibility: hidden;
+        opacity: 0;
     }
 
     &:focus-within #theme-buttons {
         visibility: visible;
+        opacity: 100%;
     }
 }

@@ -8,6 +8,8 @@ from django.conf import settings
 
 from . import autogenerators
 
+from . import logo_autogenerator
+
 
 _NPM_EXECUTABLE = os.environ.get('NPM_EXECUTABLE', 'npm')
 BUILD_PRODUCTION = [_NPM_EXECUTABLE, 'run', 'build']

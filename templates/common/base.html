@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
@@ -9,7 +10,15 @@
     </head>
     <body>
         <header>
-            <h1>KenDB</h1>
+            <h1>
+                <picture>
+                    <source srcset="{% static 'logo.svg' %}"
+                            type="image/svg+xml" />
+                    <img src="{% static 'logo.png' %}"
+                         alt="Visit homepage">
+                </picture>
+                KenDB
+            </h1>
             <nav>
                 <ul id="header-links-list">
                     <li><a href="https://example.org">Something</a>

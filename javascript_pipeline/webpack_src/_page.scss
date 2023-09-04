@@ -4,6 +4,7 @@
 @use 'constants';
 @use 'theme_switch';
 @use 'top_navbar';
+@use 'footer';
 
 /*
  * Page sizing
@@ -88,11 +89,4 @@ header {
         }
     }
 
-}
-
-/*
- * De-emphasise footer
- */
-footer {
-    color: var(--color-fg-deemph);
 }

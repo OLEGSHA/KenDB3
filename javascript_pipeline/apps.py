@@ -8,7 +8,9 @@ from django.conf import settings
 
 from . import autogenerators
 
+# Autogenerators not imported elsewhere
 from . import logo_autogenerator
+from . import license_exposer
 
 
 _NPM_EXECUTABLE = os.environ.get('NPM_EXECUTABLE', 'npm')

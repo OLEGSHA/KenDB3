@@ -42,11 +42,18 @@
             {% block content %}{% endblock %}
         </main>
         <footer>
-            <div id="copyright">&copy; OLEGSHA 2023</div>
+            <div id="copyright">
+                <span style="
+                    transform: scaleX(-1);
+                    display: inline-block;
+                ">&copy;</span>
+                OLEGSHA 2023
+                &mdash; <a href="{% static 'LICENSE.txt' %}">AGPLv3-or-later</a>
+            </div>
             <ul id="footer-links-list">
-                <li><a href="https://example.org">Something</a>
-                <li><a href="https://example.org">More</a>
-                <li><a href="https://example.org">Links!</a>
+                <li><a href="https://github.com/OLEGSHA/KenDB3">GitHub</a>
+                <li><a href="https://example.org">Left Foot</a>
+                <li><a href="https://example.org">Right Foot</a>
             </ul>
         </footer>
     </body>

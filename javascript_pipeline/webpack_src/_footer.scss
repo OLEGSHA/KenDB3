@@ -1,0 +1,45 @@
+/*
+ * Footer
+ */
+
+@use 'constants';
+
+/*
+ * De-emphasise footer
+ */
+footer {
+    color: var(--color-fg-deemph);
+}
+
+/*
+ * Layout
+ */
+footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    #footer-links-list {
+        display: flex;
+        gap: 0.5rem;
+
+        @media #{constants.$is-wide} {
+            flex-wrap: nowrap;
+
+            > li {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: nowrap;
+
+                &:not(:last-child)::after {
+                    content: '\2022'; // bullet
+                }
+            }
+        }
+
+        @media #{constants.$is-narrow} {
+            align-self: start;
+            flex-direction: column;
+        }
+    }
+}

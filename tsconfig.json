@@ -3,6 +3,7 @@
     "paths": {
       "util/*": ["./javascript_pipeline/webpack_src/*"],
       "viewmodule": ["./viewmodule/webpack_src"],
+      "profiles": ["./profiles/webpack_src"],
       "dataman": ["./api_lib/webpack_src"]
     },
     "target": "esnext",

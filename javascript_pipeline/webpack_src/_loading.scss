@@ -1,0 +1,56 @@
+/*
+ * Animated loading background
+ */
+
+@use 'sass:math';
+
+$step: 0.5rem;
+$length: $step * 8;
+$dcoord: calc($length / math.sqrt(2));
+$pos-start: -2 * $dcoord;
+$period: 1s;
+
+:root {
+    $color-a: hsl(200deg, 20%, 55%);
+    $color-b: hsl(200deg, 15%, 50%);
+    $color-c: hsl(210deg, 15%, 45%);
+    $color-d: hsl(210deg, 20%, 50%);
+
+    --loading-bg: repeating-linear-gradient(
+        45deg,
+        #{$color-a} #{$step * 0},
+        #{$step * 1.33},
+        #{$color-b} #{$step * 2},
+        #{$step * 2.66},
+        #{$color-c} #{$step * 4},
+        #{$step * 5.33},
+        #{$color-d} #{$step * 6},
+        #{$step * 6.66},
+        #{$color-a} #{$step * 8}
+    );
+}
+
+@keyframes loading-scroll {
+    from {
+        background-position: $pos-start $pos-start;
+    }
+    to {
+        background-position: $pos-start + $dcoord $pos-start - $dcoord;
+    }
+}
+
+@keyframes loading-reveal {
+    0%, 66% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 100%;
+    }
+}
+
+@mixin loading-bg {
+    background-image: var(--loading-bg);
+    background-size: 200vw 200vh;
+    animation: loading-scroll $period linear infinite,
+               loading-reveal 3s ease;
+}

@@ -1,6 +1,5 @@
 @use 'util/base';
+@use 'profiles/inline_profile';
 
 main {
-    // border: solid 2px yellow;
-    background: var(--color-bg);
 }

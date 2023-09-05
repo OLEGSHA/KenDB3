@@ -1,0 +1,44 @@
+/*
+ * Inline profile embeds
+ */
+@use 'util/fonts';
+@use 'util/constants';
+@use 'util/loading';
+
+.inline-profile {
+
+    /*
+     * Layout
+     */
+    display: inline;
+    white-space: nowrap;
+
+    /*
+     * Display name appearance
+     */
+    > .display-name {
+        font-family: var(--font-sans-serif);
+        font-weight: bold;
+    }
+
+    /*
+     * Avatar appearance
+     */
+    > img {
+        border-radius: 50%;
+
+        $size: calc(constants.$em-square / 1rem * 1em);
+        width: $size;
+        height: $size;
+        vertical-align: text-bottom;
+
+        &:not(.img-loaded):not(.img-broken) {
+            @include loading.loading-bg;
+        }
+
+        &.img-broken {
+            background: var(--color-accent);
+        }
+    }
+
+}

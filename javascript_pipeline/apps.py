@@ -1,5 +1,6 @@
 import atexit
 import os
+import logging
 import subprocess
 import sys
 
@@ -11,6 +12,9 @@ from . import autogenerators
 # Autogenerators not imported elsewhere
 from . import logo_autogenerator
 from . import license_exposer
+
+
+logger = logging.getLogger(__name__)
 
 
 _NPM_EXECUTABLE = os.environ.get('NPM_EXECUTABLE', 'npm')
@@ -47,7 +51,10 @@ class JavascriptPipelineConfig(AppConfig):
                 # Disabled by user
                 return
 
-            if not check('SHOULD_RUN') and ('runserver' not in sys.argv):
+            if not check('SHOULD_RUN') and not (
+                'runserver' in sys.argv
+                or 'collectstatic' in sys.argv
+            ):
                 # Not a real server start
                 return
 
@@ -75,6 +82,13 @@ def start_development_daemon():
 
     This function does not wait for the initial build to complete.
     """
+    if 'collectstatic' in sys.argv:
+        logger.warning(
+            'I am in development mode (DEBUG=True) and it looks like '
+            "'collectstatic' is running. Webpack will likely not complete the "
+            "initial build before 'collectstatic' terminates, and some static "
+            'files will be missing.')
+
     process = subprocess.Popen(BUILD_DEVELOPMENT, cwd=settings.BASE_DIR)
     atexit.register(subprocess.Popen.terminate, process)
 

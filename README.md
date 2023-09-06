@@ -41,6 +41,11 @@ Run a development server with a SQLite3 database:
 python3 manage.py runserver
 ```
 
+#### Useful environment variables
+- `DEBUG` – set to `False` to enter production mode.
+- `JAVASCRIPT_PIPELINE__SHOULD_RUN` – set to `True` to force JavaScript pipeline builds.
+- `JAVASCRIPT_PIPELINE__PREVENT_RUNS` – set to `True` to prevent JavaScript pipeline builds.
+
 See [Django 4.2 documentation](https://docs.djangoproject.com/en/4.2/) for more information.
 
 ### `makemigrations`???

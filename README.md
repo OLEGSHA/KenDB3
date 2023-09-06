@@ -43,6 +43,7 @@ python3 manage.py runserver
 
 #### Useful environment variables
 - `DEBUG` – set to `False` to enter production mode.
+- `JAVASCRIPT_PIPELINE__TEST_PRODUCTION` – set to `True` to force production mode for JavaScript pipeline builds. Unsafe; do not use in production.
 - `JAVASCRIPT_PIPELINE__SHOULD_RUN` – set to `True` to force JavaScript pipeline builds.
 - `JAVASCRIPT_PIPELINE__PREVENT_RUNS` – set to `True` to prevent JavaScript pipeline builds.
 

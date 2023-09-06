@@ -41,6 +41,10 @@ class JavascriptPipelineConfig(AppConfig):
         JAVASCRIPT_PIPELINE__IS_RELOAD
           Set by this method to prevent duplicate runs due to live reloads.
           Do not set manually. Overrides SHOULD_RUN.
+
+        JAVASCRIPT_PIPELINE__TEST_PRODUCTION
+          Set manually to force production mode behavior even with DEBUG.
+          Useful for testing only; do not use in production.
         """
 
         try:
@@ -65,7 +69,7 @@ class JavascriptPipelineConfig(AppConfig):
 
             # Run script
             if is_first_load:
-                if settings.DEBUG:
+                if settings.DEBUG and not check('TEST_PRODUCTION'):
                     start_development_daemon()
                 else:
                     build_pipeline()

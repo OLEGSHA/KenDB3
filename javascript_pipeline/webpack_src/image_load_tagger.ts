@@ -16,7 +16,7 @@
  * N.B.: HTMLImageElement.complete and possibly .naturalWidth are updated
  * asynchronously (see MDN docs), make sure to avoid race conditions.
  */
-import { setClasses, debug } from './common';
+import { setClasses } from './common';
 
 /**
  * Set tags according to current state of image and remove listeners.

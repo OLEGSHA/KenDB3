@@ -22,6 +22,12 @@ $padding: constants.$line;
         background-image: $fill;
         border-radius: 50%;
         border: constants.$line solid var(--color-fg);
+
+        /*
+         * Prevent seams
+         */
+        background-size: 110%;
+        background-position: center;
     }
 }
 
@@ -71,7 +77,7 @@ $padding: constants.$line;
         padding: $padding;
         gap: $padding;
         margin: {
-            top: $padding;
+            top: 2 * $padding;
             left: -1 * $padding;
             right: -1 * $padding;
             bottom: 0;
@@ -136,10 +142,12 @@ $padding: constants.$line;
 
             &.light::before {
                 background: var(--theme-light-color-bg);
+                border: none;
             }
 
             &.dark::before {
                 background: var(--theme-dark-color-bg);
+                border: none;
             }
         }
 

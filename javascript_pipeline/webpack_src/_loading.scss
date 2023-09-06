@@ -39,18 +39,12 @@ $period: 1s;
     }
 }
 
-@keyframes loading-reveal {
-    0%, 66% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 100%;
-    }
-}
-
 @mixin loading-bg {
     background-image: var(--loading-bg);
     background-size: 200vw 200vh;
-    animation: loading-scroll $period linear infinite,
-               loading-reveal 3s ease;
+    animation: loading-scroll $period linear infinite;
+
+    @media (prefers-reduced-motion) {
+        animation: none;
+    }
 }

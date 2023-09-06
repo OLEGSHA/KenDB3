@@ -33,7 +33,7 @@
             </div>
         </div>
         <ul id="submission-list">
-            <li>Loading...
+            <li class="placeholder">Loading...
         </ul>
     </script>
 
@@ -83,7 +83,7 @@
 
             <span class="submitted-by-label">Submitted by</span>
             <span class="submitted-by">
-                <%include submitted_by tmpl="tmpl-inline-profile" /%>
+                <%include submitted_by tmpl="#tmpl-inline-profile" /%>
             </span>
 
             <span id="revision-label">Map version</span>
@@ -141,7 +141,9 @@
             <%/if%>
 
             <span class="submitted-by-label">Submitted by</span>
-            <span class="submitted-by"><%>submitted_by.display_name%></span>
+            <span class="submitted-by">
+                <%include submitted_by tmpl="#tmpl-inline-profile" /%>
+            </span>
         </li>
     </script>
 

@@ -143,9 +143,6 @@ export class ModelManager<Model extends ModelBase> {
         // Contains all IDs that are not in map
         const missingIds = new Set<number>(ids);
 
-        debug(`Dataman: getBulk ${this.modelClass.name} fields ${fields} IDs`,
-              Array.from(missingIds));
-
         // Request download of any non-Available fields
         this.download(missingIds, fields);
 
@@ -209,8 +206,6 @@ export class ModelManager<Model extends ModelBase> {
      * @returns all models; order is not defined
      */
     async getAll(fields: string = '*'): Promise<Model[]> {
-        debug(`Dataman: getAll ${this.modelClass.name} fields ${fields}`);
-
         // Request download
         if (this.statusOfDump(fields) === Status.NotRequested) {
             this.downloadAll(fields);
@@ -288,9 +283,6 @@ export class ModelManager<Model extends ModelBase> {
             return;
         }
 
-        debug(`Dataman: download ${this.modelClass.name} `
-              + `fields ${fields} IDs`, Array.from(idsToDownload));
-
         const url = new URL(this.requestUrl);
         url.searchParams.append('ids', Array.from(idsToDownload).join(','));
         url.searchParams.append('fields', fields);
@@ -314,9 +306,6 @@ export class ModelManager<Model extends ModelBase> {
      */
     downloadAll(fields: string): void {
         this.setStatusOfDump(fields, Status.Pending);
-
-        debug(`Dataman: download ${this.modelClass.name} `
-              + `fields ${fields} dump`);
 
         const url = new URL(this.requestUrl);
         url.searchParams.append('ids', 'all');
@@ -430,9 +419,8 @@ export class ModelManager<Model extends ModelBase> {
             this.setStatusOfDump(fields, Status.Available);
         }
 
-        debug(`Dataman: doAddData ${this.modelClass.name} `
-              + `fields ${fields} IDs`,
-              Array.from(seenInstances).map((i) => i.id));
+        debug(`Dataman: new data for ${this.modelClass.name}[${fields}]:\n`,
+              Array.from(seenInstances));
 
         return seenInstances;
     }

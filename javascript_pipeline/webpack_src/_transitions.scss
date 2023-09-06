@@ -1,3 +1,7 @@
-* {
+*, *::before, *::after {
     transition: all 150ms ease;
+
+    @media (prefers-reduced-motion) {
+        transition: none;
+    }
 }

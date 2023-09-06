@@ -35,7 +35,6 @@ const COOKIE = new Cookie(
  * Called on cookie change and initialization; applies the theme choice.
  */
 function onChange() {
-    console.log('Cookie is now', COOKIE.value, COOKIE.exists() ? 'exists' : 'absent');
     setClasses(document.body, 'theme-', getTheme() ?? []);
 }
 

@@ -27,7 +27,6 @@ header nav #header-links-list {
     /*
      * Appearance
      */
-    // border-top: solid constants.$line var(--color-accent);
     box-shadow: inset 0 constants.$line var(--color-accent);
 
     > li > a {
@@ -116,10 +115,11 @@ header nav #header-links-list {
          */
         overflow-x: hidden;
 
+        $margin: 0.5px;
         @include utils.mask(
             linear-gradient(to left,
-                            white $row-height,
-                            transparent $row-height,
+                            white calc($row-height - $margin),
+                            transparent calc($row-height - $margin),
                             white 2rem + $row-height)
         );
 

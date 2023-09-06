@@ -13,12 +13,13 @@ declare const PRODUCTION : boolean;
  *
  * @param args the arguments for console.log
  */
-export function debug(...args: any[]): void {
-    if (!PRODUCTION) {
-        console.log('%c[Debug]', 'font-weight: bold;',
-                    ...args);
+export const debug = (
+    PRODUCTION
+    ? (...args: any[]): void => {}
+    : function debug(...args: any[]): void {
+        console.log('%c[Debug]', 'font-weight: bold;', ...args);
     }
-}
+);
 
 /**
  * Always throws an Error with given message.

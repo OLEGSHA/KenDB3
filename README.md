@@ -49,6 +49,10 @@ python3 manage.py runserver
 
 See [Django 5.0 documentation](https://docs.djangoproject.com/en/5.0/) for more information.
 
+## Production setup
+
+See [deployment instructions](docs/DEPLOYMENT.md).
+
 ### `makemigrations`???
 
 Project is not production-ready yet. Migrations will be committed once the code is deployed on windcorp.ru.

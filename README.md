@@ -47,7 +47,7 @@ python3 manage.py runserver
 - `JAVASCRIPT_PIPELINE__SHOULD_RUN` – set to `True` to force JavaScript pipeline builds.
 - `JAVASCRIPT_PIPELINE__PREVENT_RUNS` – set to `True` to prevent JavaScript pipeline builds.
 
-See [Django 4.2 documentation](https://docs.djangoproject.com/en/4.2/) for more information.
+See [Django 5.0 documentation](https://docs.djangoproject.com/en/5.0/) for more information.
 
 ### `makemigrations`???
 

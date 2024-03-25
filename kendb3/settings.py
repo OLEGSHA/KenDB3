@@ -6,6 +6,7 @@ be replaced using environment variables in a production environment.
 The following Django settings can be set from environment variables:
   DEBUG
   SECRET_KEY
+  SECRET_KEY_FILE
   ALLOWED_HOSTS
   DATABASE_URL
   STATIC_ROOT
@@ -29,6 +30,8 @@ env = environ.Env(
         'django-insecure-s!q1auw%5c6s(csx3(og24s*^50b7ln-^@hby!tcpakwc^ha6('
     ),
 
+    SECRET_KEY_FILE=(str, None),
+
     ALLOWED_HOSTS=(list, []),
 
     STATIC_ROOT=(str, None),
@@ -41,7 +44,12 @@ env = environ.Env(
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_KEY = env('SECRET_KEY')
+if not env('SECRET_KEY_FILE'):
+    SECRET_KEY = env('SECRET_KEY')
+else:
+    with open(env('SECRET_KEY_FILE'), 'rb') as secret_key_file:
+        SECRET_KEY = secret_key_file.read()
+
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 STATIC_ROOT = env('STATIC_ROOT')

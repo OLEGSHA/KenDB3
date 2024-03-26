@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-deploy:
     name: Build and deploy code
-    runs-on: ubuntu-latest
+    runs-on: alpine_with_docker
     steps:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

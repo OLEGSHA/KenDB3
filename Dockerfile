@@ -26,10 +26,10 @@ EXPOSE 80
 ENV DEBUG=False
 
 # Launch command
-CMD ["gunicorn",
-    "kendb3.wsgi",
-    "-b", "0.0.0.0:80",
-    "--log-file", "-",
-    "--access-logfile", "-",
-    "--workers", "4",
-    "--keep-alive", "0"]
+CMD [ "gunicorn", \
+      "kendb3.wsgi", \
+      "-b", "0.0.0.0:80", \
+      "--log-file", "-", \
+      "--access-logfile", "-", \
+      "--workers", "4", \
+      "--keep-alive", "0" ]

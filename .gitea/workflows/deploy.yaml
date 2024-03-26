@@ -1,0 +1,22 @@
+name: Deploy to windcorp.ru
+
+on:
+  push:
+    branches:
+      - main
+      - development
+
+jobs:
+  build-and-deploy:
+    name: Build and deploy code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_REPOSITORY }}/kendb3:${{ gitea.ref_name }}
+      - name: Notify host of new Docker image
+        run: |
+          TYPE=${{ gitea.ref_name }}
+          ${{ secrets.NOTIFY_HOST_COMMAND }}

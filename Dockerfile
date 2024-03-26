@@ -1,4 +1,4 @@
-FROM python:3-debian
+FROM python:3
 
 WORKDIR /usr/src/app
 

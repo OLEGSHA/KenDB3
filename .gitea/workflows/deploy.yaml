@@ -17,6 +17,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_REPOSITORY }}/kendb3:${{ gitea.ref_name }}
       - name: Notify host of new Docker image
+        shell: sh
         run: |
           TYPE=${{ gitea.ref_name }}
           ${{ secrets.NOTIFY_HOST_COMMAND }}

@@ -1,0 +1,38 @@
+# This is the docker-compose used when deploying the website at windcorp.ru.
+#
+# The environment requires quite a bit of setup for this file to become useful:
+#   - kendb3 image must be built in advance and pushed to a registry
+#
+#   - All environment variables must be set properly:
+#     - DOCKER_REGISTRY: Registry where kendb3 image can be pulled from
+#     - TAG:             kendb3 image tag. On windcorp.ru, different tags are
+#                        used to separate production and staging images
+#     - PORT:            Host port where container port 80 should be published
+#     - ALLOWED_HOSTS:   The value of ALLOWED_HOSTS in container (expected FQDN)
+#
+#   - ./run/django_secret_key must exist
+#
+#   - ./db.sqlite3 must exist
+#
+# It is probably of little value to developers. It is included in the repository
+# simply to help keep deployment consistent.
+#
+# See docs/DEPLOYMENT.md for more details.
+
+service:
+
+  kendb3:
+    image: "${DOCKER_REGISTRY}/kendb3:${TAG}"
+    ports:
+      - "${PORT}:80"
+    environment:
+      SECRET_KEY_FILE: "/run/secrets/django_secret_key"
+      ALLOWED_HOSTS:
+    volumes:
+      - "./db.sqlite3:/usr/src/app/db.sqlite3"
+    secrets:
+      - django_secret_key
+
+secrets:
+  django_secret_key:
+    file: "./run/django_secret_key"

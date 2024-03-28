@@ -19,7 +19,7 @@
 #
 # See docs/DEPLOYMENT.md for more details.
 
-service:
+services:
 
   kendb3:
     image: "${DOCKER_REGISTRY}/kendb3:${TAG}"

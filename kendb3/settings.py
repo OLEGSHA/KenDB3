@@ -56,6 +56,7 @@ else:
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 STATIC_ROOT = env('STATIC_ROOT')
+ERROR_LOG = env('ERROR_LOG')
 
 DATABASES = {
     'default': env.db(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")

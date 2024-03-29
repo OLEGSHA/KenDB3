@@ -9,6 +9,7 @@ The following Django settings can be set from environment variables:
   SECRET_KEY_FILE
   ALLOWED_HOSTS
   DATABASE_URL
+  ERROR_LOG
   STATIC_ROOT
 """
 
@@ -24,6 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
 
     DEBUG=(bool, True),
+
+    ERROR_LOG=(str, None),
 
     SECRET_KEY=(
         str,
@@ -63,6 +66,28 @@ DATABASES = {
 SILENCED_SYSTEM_CHECKS = [
     # Empty
 ]
+
+
+# Logging setup for production
+if ERROR_LOG:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "file": {
+                "level": "WARNING",
+                "class": "logging.FileHandler",
+                "filename": ERROR_LOG,
+            },
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["file"],
+                "level": "WARNING",
+                "propagate": True,
+            },
+        },
+    }
 
 
 # (Here be dragons)

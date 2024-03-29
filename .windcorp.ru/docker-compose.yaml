@@ -14,6 +14,8 @@
 #
 #   - ./db.sqlite3 must exist
 #
+#   - ./error.log must exist
+#
 # It is probably of little value to developers. It is included in the repository
 # simply to help keep deployment consistent.
 #
@@ -27,9 +29,11 @@ services:
       - "${PORT}:80"
     environment:
       SECRET_KEY_FILE: "/run/secrets/django_secret_key"
+      ERROR_LOG: "/var/log/django.error.log"
       ALLOWED_HOSTS:
     volumes:
       - "./db.sqlite3:/usr/src/app/db.sqlite3"
+      - "./error.log:/var/log/django.error.log"
     secrets:
       - django_secret_key
 

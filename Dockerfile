@@ -24,6 +24,7 @@ EXPOSE 80
 
 # Configure Django
 ENV DEBUG=False
+ENV STATIC_ROOT=/var/www/kendb3_static
 
 # Launch command
 CMD [ "sh", "./.windcorp.ru/start.sh", \

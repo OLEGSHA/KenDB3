@@ -13,6 +13,7 @@ The repository is mostly self-contained. The following is required to deploy the
 - provide a Django secret key using environment variables `SECRET_KEY_FILE` or `SECRET_KEY` (Django secret key can be any string)
 - set `DEBUG` environment variable to `False` to enable production mode in Django
 - set `ALLOWED_HOSTS` environment variable to the fully qualified domain name to expect in HTTP Host header
+- set `STATIC_ROOT` environment variable to the path where static files should be stored
 - set `ERROR_LOG` environment variable to the path where errors should be logged in plain text
 
 After that, the webserver can be started:
@@ -38,6 +39,7 @@ docker run \
     --volume=./error.log:/error.log \
     --env=SECRET_KEY_FILE=/django_secret_key \
     --env=ERROR_LOG=/error.log \
+    --env=STATIC_ROOT=/static \
     --env=ALLOWED_HOSTS=kendb3.example.com \
     kendb3:latest
 ```

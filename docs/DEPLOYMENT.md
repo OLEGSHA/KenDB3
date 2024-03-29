@@ -36,13 +36,15 @@ docker run \
     --publish=80:80 \
     --volume=./db.sqlite3:/usr/src/app/db.sqlite3 \
     --volume=./django_secret_key:/django_secret_key \
-    --volume=./error.log:/error.log \
+    --volume=./error.log:/var/log/kendb3.error.log \
     --env=SECRET_KEY_FILE=/django_secret_key \
-    --env=ERROR_LOG=/error.log \
+    --env=ERROR_LOG=/var/log/kendb3.error.log \
     --env=STATIC_ROOT=/static \
     --env=ALLOWED_HOSTS=kendb3.example.com \
     kendb3:latest
 ```
+
+Logs can be found in `/var/log/` inside the container.
 
 ## Gitea Actions
 

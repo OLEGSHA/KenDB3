@@ -29,11 +29,13 @@ services:
       - "${PORT}:80"
     environment:
       SECRET_KEY_FILE: "/run/secrets/django_secret_key"
-      ERROR_LOG: "/var/log/django.error.log"
+      ERROR_LOG: "/var/log/kendb3.error.log"
       ALLOWED_HOSTS:
     volumes:
       - "./db.sqlite3:/usr/src/app/db.sqlite3"
-      - "./error.log:/var/log/django.error.log"
+      - "./gunicorn.log:/var/log/kendb3.gunicorn.log"
+      - "./access.log:/var/log/kendb3.access.log"
+      - "./error.log:/var/log/kendb3.error.log"
     secrets:
       - django_secret_key
 

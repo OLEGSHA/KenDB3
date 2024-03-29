@@ -30,7 +30,7 @@ ENV STATIC_ROOT=/var/www/kendb3_static
 CMD [ "sh", "./.windcorp.ru/start.sh", \
       "kendb3.wsgi", \
       "-b", "0.0.0.0:80", \
-      "--log-file", "-", \
-      "--access-logfile", "-", \
-      "--workers", "4", \
+      "--log-file", "/var/log/kendb.gunicorn.log", \
+      "--access-logfile", "/var/log/kendb.access.log", \
+      "--workers", "1", \
       "--keep-alive", "0" ]

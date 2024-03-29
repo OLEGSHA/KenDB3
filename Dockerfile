@@ -9,8 +9,8 @@ RUN apt-get update && \
     && apt-get clean
 
 # Install Python dependencies
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-production.txt ./
+RUN pip install --no-cache-dir -r requirements-production.txt
 
 # Install NPM dependencies
 COPY package.json package-lock.json ./

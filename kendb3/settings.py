@@ -111,6 +111,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    '(whitenoise here)',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -118,6 +119,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG:
+    MIDDLEWARE.remove('(whitenoise here)');
+else:
+    MIDDLEWARE[MIDDLEWARE.index('(whitenoise here)')] = \
+        'whitenoise.middleware.WhiteNoiseMiddleware'
 
 ROOT_URLCONF = 'kendb3.urls'
 

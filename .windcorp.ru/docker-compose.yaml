@@ -30,7 +30,7 @@ services:
     environment:
       SECRET_KEY_FILE: "/run/secrets/django_secret_key"
       ERROR_LOG: "/var/log/kendb3.error.log"
-      ALLOWED_HOSTS:
+      ALLOWED_HOSTS: 'localhost'
     volumes:
       - "./db.sqlite3:/usr/src/app/db.sqlite3"
       - "./gunicorn.log:/var/log/kendb3.gunicorn.log"

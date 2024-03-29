@@ -18,6 +18,8 @@ The repository is mostly self-contained. The following is required to deploy the
 After that, the webserver can be started:
 ```bash
 # In repository root
+python3 manage.py makemigrations &&
+python3 manage.py migrate &&
 gunicorn kendb3.wsgi
 ```
 

@@ -26,7 +26,7 @@ EXPOSE 80
 ENV DEBUG=False
 
 # Launch command
-CMD [ "gunicorn", \
+CMD [ "sh" "./.windcorp.ru/start.sh", \
       "kendb3.wsgi", \
       "-b", "0.0.0.0:80", \
       "--log-file", "-", \

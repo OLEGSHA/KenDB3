@@ -17,7 +17,10 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_REPOSITORY }}/kendb3:${{ gitea.ref_name }}
       - name: Notify host of new Docker image
-        shell: sh
-        run: |
-          TYPE=${{ gitea.ref_name }}
-          ${{ secrets.NOTIFY_HOST_COMMAND }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: service kendb3@${{ gitea.ref_name }} reload

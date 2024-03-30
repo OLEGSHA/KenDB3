@@ -3,7 +3,7 @@ name: Deploy to windcorp.ru
 on:
   push:
     branches:
-      - main
+      # - main
       - development
 
 jobs:

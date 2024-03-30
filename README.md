@@ -74,8 +74,11 @@ Project is not production-ready yet. Migrations will be committed once the code 
   - [Pillow](https://python-pillow.org/) – image processing; used to preprocess static resources
   - [cairosvg](https://cairosvg.org/documentation/) – SVG renderer; used to preprocess static resources
   - Production database: [Dolt](https://github.com/dolthub/dolt) – MySQL-compatible database with version control _(not yet implemented)_
-- **Deployment**: _(not yet implemented)_
-  - something something [Gitea](https://gitea.io/) actions + [Docker](https://www.docker.com/)
+- **Deployment**:
+  - [Gunicorn](https://gunicorn.org/) – WSGI server (HTTP server for Django)
+  - [WhiteNoise](https://whitenoise.readthedocs.io/en/latest/) – static file serving for Django
+  - [Gitea Actions](https://docs.gitea.com/next/usage/actions/overview) – CI ([visit](https://gitea.windcorp.ru/OLEGSHA/KenDB3/actions))
+  - [Docker](https://www.docker.com/) – packaging and runtime management
 
 ## License and reuse
 

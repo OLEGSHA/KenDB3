@@ -2,13 +2,20 @@
 
 ## Overview
 
-![Overview diagram of KenDB3 deployment on windcorp.ru](deployment-overview.drawio.svg)
+> **TL;DR**
+>
+> Django is served [Gunicorn](https://gunicorn.org/). Static files are served by Gunicorn, too,
+via [WhiteNoise](https://whitenoise.readthedocs.io/en/latest/). The application is packaged into a Docker image.
+>
+> CI on windcorp.ru builds new images based on `main` and `development` branches and deploys them automatically.
+>
+> Deployment is handled by a script named manage.sh on windcorp.ru. It uses `.windcorp.ru/docker-compose.yaml` to deploy the Docker image and sets up a reverse proxy with Apache2 that is installed on host.
 
-Feel free to ask OLEGSHA personally about the details of "Obscured environment" if you're interested.
+![Overview diagram of KenDB3 deployment on windcorp.ru](deployment-overview.drawio.svg)
 
 ## Prerequisites
 
-The repository is mostly self-contained. The following is required to deploy the website:
+The following is required to deploy the website:
 - install Python and NPM dependencies
 - provide a Django secret key using environment variables `SECRET_KEY_FILE` or `SECRET_KEY` (Django secret key can be any string)
 - set `DEBUG` environment variable to `False` to enable production mode in Django
@@ -50,6 +57,8 @@ Logs can be found in `/var/log/` inside the container.
 
 The repository additionally contains a CI configuration for automatic deployment at windcorp.ru by means of [Gitea Actions](https://docs.gitea.com/usage/actions/overview) (very similar to [GitHub Actions](https://github.com/features/actions)).
 
-The action checks out the repository into a container, then builds the Docker image and tags it appropriately. Finally, the host is notified through a method I will not disclose, and the running instance is reloaded based on the image that was built.
+The action checks out the repository into a container, then builds the Docker image and tags it appropriately. Finally, the host is notified through SSH, and the running instance is reloaded based on the image that was built.
+
+See [.windcorp.ru](../.windcorp.ru) for some windcorp.ru-specific files.
 
 The infrastructure on host is not represented in this repository.

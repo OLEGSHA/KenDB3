@@ -2,7 +2,7 @@
 
 ## Overview
 
-![Overview diagram of KenDB3 deployment on windcorp.ru](deployment-overview.svg)
+![Overview diagram of KenDB3 deployment on windcorp.ru](deployment-overview.drawio.svg)
 
 Feel free to ask OLEGSHA personally about the details of "Obscured environment" if you're interested.
 

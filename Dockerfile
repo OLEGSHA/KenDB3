@@ -26,6 +26,12 @@ EXPOSE 80
 ENV DEBUG=False
 ENV STATIC_ROOT=/var/www/kendb3_static
 
+# Bake git information
+ARG GIT_SHA=''
+ENV GIT_SHA=$GIT_SHA
+ARG GIT_REF=''
+ENV GIT_REF=$GIT_REF
+
 # Launch command
 CMD [ "sh", "./.windcorp.ru/start.sh", \
       "kendb3.wsgi", \

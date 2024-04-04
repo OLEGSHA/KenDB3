@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     'profiles.apps.ProfilesConfig',
     'submissions.apps.SubmissionsConfig',
     'javascript_pipeline.apps.JavascriptPipelineConfig',
+    'util.apps.UtilConfig',
     'taggit',
     'django.contrib.admin',
     'django.contrib.auth',

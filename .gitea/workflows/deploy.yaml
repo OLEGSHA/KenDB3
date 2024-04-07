@@ -15,9 +15,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          build-args:
-            - GIT_SHA=${{ gitea.sha }}
-            - GIT_REF=${{ gitea.ref_name }}
+          build-args: GIT_SHA=${{ gitea.sha }},GIT_REF=${{ gitea.ref_name }}
           tags: ${{ secrets.DOCKER_REPOSITORY }}/kendb3:${{ gitea.ref_name }}
       - name: Notify host of new Docker image
         uses: appleboy/ssh-action@v1.0.3

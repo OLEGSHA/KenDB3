@@ -3,12 +3,20 @@
 /*
  * Theme definitions
  */
+@function make-bg-gradient-start($base) {
+    @return color.mix($base, hsl(188, 90%, 80%), 90%);
+}
+
+@function make-bg-gradient-end($base) {
+    @return color.mix($base, hsl(188, 90%, 40%), 60%);
+}
+
 @function make-bg-gradient($base) {
     @return linear-gradient(
         to bottom,
-        color.mix($base, hsl(188, 90%, 80%), 90%),
+        #{make-bg-gradient-start($base)},
         66%,
-        color.mix($base, hsl(188, 90%, 40%), 60%),
+        #{make-bg-gradient-end($base)},
     );
 }
 
@@ -19,6 +27,7 @@
     $color-links,
 ) {
     --bg: #{make-bg-gradient($color-bg) fixed};
+    --bg-start: #{make-bg-gradient-start($color-bg)};
     --bg-alt: #{make-bg-gradient($color-bg-alt) fixed};
 
     --color-bg: #{$color-bg};

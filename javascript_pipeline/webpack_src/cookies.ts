@@ -2,6 +2,8 @@
  * A simple cookie API.
  */
 
+import { PRODUCTION } from 'util/common';
+
 /**
  * Metadata of a cookie.
  */
@@ -158,11 +160,13 @@ function doSet(cookie: Cookie, val: string | null): void {
     const expire = new Date();
     expire.setSeconds(expire.getSeconds() + expireIn);
 
+    const secure = PRODUCTION ? '; secure' : '';
+
     document.cookie = encodeURIComponent(cookie.name)
                       + `=${encodeURIComponent(value)}`
                       + `; expires=${expire.toUTCString()}`
                       + '; samesite=strict'
-                      + '; secure';
+                      + secure;
 }
 
 /**

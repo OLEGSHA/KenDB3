@@ -6,7 +6,7 @@
  * A Webpack variable.
  * true iff webpack mode is production, not development.
  */
-declare const PRODUCTION : boolean;
+export declare const PRODUCTION : boolean;
 
 /**
  * Log args to console unless in production mode.

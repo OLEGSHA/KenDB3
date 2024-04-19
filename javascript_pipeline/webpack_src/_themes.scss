@@ -63,10 +63,8 @@ body {
  */
 
 // Default
-@media not (prefers-color-scheme: dark) {
-    body:not(.theme-light):not(.theme-dark) {
-        @include theme-light-def;
-    }
+body:not(.theme-light):not(.theme-dark) {
+    @include theme-light-def;
 }
 
 // Use dark theme if preferred

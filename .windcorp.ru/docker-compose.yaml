@@ -8,13 +8,14 @@
 #     - TAG:             kendb3 image tag. On windcorp.ru, different tags are
 #                        used to separate production and staging images
 #     - PORT:            Host port where container port 80 should be published
-#     - ALLOWED_HOSTS:   The value of ALLOWED_HOSTS in container (expected FQDN)
+#     - ALLOWED_HOSTS:   The value of ALLOWED_HOSTS in container (value of Host:
+#                        HTTP header, usually FQDN or "localhost")
 #
 #   - ./run/django_secret_key must exist
 #
 #   - ./db.sqlite3 must exist
 #
-#   - ./error.log must exist
+#   - ./access.log, ./gunicorn.log, ./error.log must exist
 #
 # It is probably of little value to developers. It is included in the repository
 # simply to help keep deployment consistent.

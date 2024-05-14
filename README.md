@@ -4,13 +4,7 @@ This is the source code of KenDB3, intended to go live on https://kendb.windcorp
 
 Up-to-date task tree: [kendb3-plan.drawio.svg](https://windcorp.ru/other/kendb3-plan.drawio.svg).
 
-See also [PROJECT_LAYOUT.md](docs/PROJECT_LAYOUT.md)
-
-## Approach
-
-KenDB3 is a web application – as much processing as reasonable should happen on the frontend. The goal is to reduce load times for the visitors and Internet traffic for the host.
-
-For pages with dynamic content, frontend is highly autonomous; it communicates with the host using a REST-like API.
+See also [PROJECT_LAYOUT.md](docs/PROJECT_LAYOUT.md) and other files in [`docs/`](docs).
 
 ## Developer setup
 

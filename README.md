@@ -4,6 +4,8 @@ This is the source code of KenDB3, intended to go live on https://kendb.windcorp
 
 Up-to-date task tree: [kendb3-plan.drawio.svg](https://windcorp.ru/other/kendb3-plan.drawio.svg).
 
+See also [PROJECT_LAYOUT.md](docs/PROJECT_LAYOUT.md)
+
 ## Approach
 
 KenDB3 is a web application – as much processing as reasonable should happen on the frontend. The goal is to reduce load times for the visitors and Internet traffic for the host.
@@ -18,11 +20,11 @@ Initial setup:
 # Clone repository
 git clone https://github.com/OLEGSHA/KenDB3.git
 
-# Setup and activate a dedicated venv
-python3 -m venv KenDB3-venv
-source KenDB3-venv/bin/activate
-
 cd KenDB3
+
+# Setup and activate a dedicated venv
+python3 -m venv .venv
+source .venv/bin/activate
 
 # Install Python packages
 pip3 install -r requirements.txt
@@ -30,10 +32,13 @@ pip3 install -r requirements.txt
 # Install frontend packages
 npm install
 
-# Configure development database (see below)
+# Configure development database
 python3 manage.py makemigrations
 python3 manage.py migrate
+python3 manage.py loaddata fixtures/sample_users.json fixtures/sample_data.json
 ```
+
+The database must contain some sample data for the applications to run properly. Depending on your needs, you may want to [create a Django superuser](https://docs.djangoproject.com/en/5.0/ref/django-admin/#createsuperuser).
 
 Run a development server with a SQLite3 database:
 

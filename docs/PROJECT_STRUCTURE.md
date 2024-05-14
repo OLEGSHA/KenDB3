@@ -52,6 +52,8 @@ KenDB3/
 ├── .git/
 ├── .gitea/                CI files for Gitea Actions (analogous to .github)
 ├── .gitignore
+├── fixtures/              Sample data for the developer database, see
+│                            MANAGING_SAMPLE_DATA.md for details
 ├── javascript_pipeline/   Django app; frontend pipeline implementation
 ├── kendb3/                Django project
 ├── LICENSE

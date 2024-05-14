@@ -2,6 +2,9 @@
 *.py[cod]
 __pycache__
 
+# Suggested Python venv location
+/.venv
+
 # Default developer database
 /db.sqlite3
 

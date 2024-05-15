@@ -13,5 +13,3 @@ Webpack development daemon watches TypeScript and SCSS files and recompiles asse
 When compiling TypeScript, error messages are not emitted by Webpack. Developers can run `tsc --watch --pretty` in a separate terminal to see compilation errors live. JavaScript will not be produced due to `"noEmit": true` in `tsconfig.json`.
 
 Sometimes, a full restart may still be necessary.
-
-(TODO: run.sh with tmux)

@@ -4,7 +4,7 @@ This is the source code of KenDB3, intended to go live on https://kendb.windcorp
 
 Up-to-date task tree: [kendb3-plan.drawio.svg](https://windcorp.ru/other/kendb3-plan.drawio.svg).
 
-See also [PROJECT_LAYOUT.md](docs/PROJECT_LAYOUT.md) and other files in [`docs/`](docs).
+See also [ARCHITECTURE.md](docs/ARCHITECTURE.md) and other files in [`docs/`](docs).
 
 ## Developer setup
 

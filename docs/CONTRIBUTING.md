@@ -22,7 +22,7 @@ Please fill out an issue on [GitHub](https://github.com/OLEGSHA/KenDB3/issues) a
 
 Great! Fork the repository on GitHub and begin. Development setup should not take more than a minute; see [README](../README.md#developer-setup).
 
-Take a look at [DEVELOPMENT.md](DEVELOPMENT.md), it has some onboarding and tips and tricks. There's decent high-level documentation in [docs](.), especially [PROJECT_LAYOUT.md](PROJECT_LAYOUT.md).
+Take a look at [DEVELOPMENT.md](DEVELOPMENT.md), it has some onboarding and tips and tricks. There's decent high-level documentation in [docs](.), especially [ARCHITECTURE.md](ARCHITECTURE.md).
 
 When you've got some commits, open a draft pull request on GitHub. We want to review and give corrections earlier rather then later.
 

@@ -2,7 +2,7 @@
 
 ## Onboarding
 
-New developers should start with [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md); it explains the general layout and provides further links.
+New developers should start with [ARCHITECTURE.md](ARCHITECTURE.md); it explains the general layout and provides further links.
 
 ## Live reload
 
